@@ -1,0 +1,28 @@
+:root{
+  --bg:#F8F9FB; --white:#FFFFFF; --border:rgba(0,0,0,0.12);
+  --text:#1A1A1A; --muted:#6E6E6E; --gold:#C6A14B; --gold2:#EACB66;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,.05);padding:18px}
+.input{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;width:100%}
+.input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(198,161,75,.25)}
+.btn{border:1px solid var(--gold);background:linear-gradient(180deg,rgba(230,200,100,.16),rgba(198,161,75,.1));padding:.65rem 1rem;border-radius:10px;font-weight:600;cursor:pointer}
+.btn:hover{box-shadow:0 0 12px rgba(198,161,75,.28)}
+.tag{border:1px solid var(--border);border-radius:999px;padding:.35rem .6rem;font-size:.82rem;background:#fff;color:var(--muted)}
+.tag:hover{border-color:var(--gold);color:var(--text)}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px}
+.kpi h4{margin:0 0 6px;color:var(--muted);font-weight:500;font-size:.9rem}
+.kpi span{font-size:26px;font-weight:800;background:linear-gradient(90deg,var(--gold2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar{width:250px;height:100vh;background:#fff;border-right:1px solid var(--border);position:fixed;left:0;top:0;padding:20px 16px;display:flex;flex-direction:column;gap:8px}
+.logo{font-weight:800;font-size:20px;margin-bottom:20px}
+.nav-item{padding:10px 12px;border-radius:10px;color:var(--muted);cursor:pointer;display:flex;gap:10px;align-items:center}
+.nav-item:hover,.nav-item.active{background:linear-gradient(90deg,rgba(230,200,100,.15),rgba(198,161,75,.08));color:var(--text);font-weight:600}
+.main{margin-left:250px;padding:22px 28px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--border);padding:10px 8px;text-align:left;font-size:.95rem}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.hidden{display:none}
+dialog{border:1px solid var(--border);border-radius:16px}

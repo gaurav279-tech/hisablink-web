@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HisabLink — Setup Your Business</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+.step-active { @apply bg-gold text-white; }
+.step-inactive { @apply bg-gray-200 text-gray-600; }
+.input-box {
+  @apply w-full border rounded-lg px-3 py-3;
+  background: rgba(255,255,255,0.85);
+}
+.input-box:focus { @apply outline-none ring-2 ring-gold/50; }
+</style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex justify-center items-center p-6">
+
+<div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8">
+
+  <!-- Progress Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div id="step1Circle" class="w-8 h-8 flex items-center justify-center rounded-full step-active font-semibold">1</div>
+    <div class="flex-1 h-px bg-gray-300"></div>
+    <div id="step2Circle" class="w-8 h-8 flex items-center justify-center rounded-full step-inactive font-semibold">2</div>
+    <div class="flex-1 h-px bg-gray-300"></div>
+    <div id="step3Circle" class="w-8 h-8 flex items-center justify-center rounded-full step-inactive font-semibold">3</div>
+  </div>
+
+  <!-- STEP CONTENT -->
+
+  <!-- Step 1 -->
+  <div id="step1">
+    <h2 class="text-2xl font-bold mb-2">Welcome to Hisab<span class="text-[#c6a14b]">Link</span> 👋</h2>
+    <p class="text-gray-600 mb-6">Let's get your business profile set up.</p>
+    <button id="toStep2" class="w-full bg-[#c6a14b] text-white py-3 rounded-lg font-semibold hover:bg-yellow-600 transition">
+      Start Setup →
+    </button>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2" class="hidden">
+    <h2 class="text-xl font-bold mb-2">Business Details</h2>
+    <p class="text-gray-600 mb-4 text-sm">This info will appear on invoices</p>
+
+    <div class="space-y-3">
+      <input id="bizName" class="input-box" placeholder="Business Name*" required />
+      <input id="ownerName" class="input-box" placeholder="Your Name*" required />
+      <input id="bizPhone" class="input-box" placeholder="Business Phone*" required />
+      <input id="bizEmail" class="input-box" placeholder="Business Email*" required />
+      <input id="bizAddress" class="input-box" placeholder="Address / City*" required />
+      <input id="bizGst" class="input-box" placeholder="GST Number (Optional)" />
+    </div>
+
+    <div class="mt-6 flex justify-between">
+      <button id="back1" class="text-gray-600">← Back</button>
+      <button id="toStep3" class="bg-[#c6a14b] text-white py-2 px-6 rounded-lg font-semibold hover:bg-yellow-600">
+        Next →
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div id="step3" class="hidden">
+    <h2 class="text-xl font-bold mb-2">Branding (Optional)</h2>
+    <p class="text-gray-600 mb-4 text-sm">Add your logo now or skip</p>
+
+    <label class="block border border-dashed p-6 text-center rounded-lg cursor-pointer hover:bg-gray-50">
+      <input type="file" id="logoUpload" accept="image/*" hidden>
+      <div id="logoPreview" class="text-gray-500">Upload Logo</div>
+    </label>
+
+    <div class="mt-6 flex justify-between">
+      <button id="back2" class="text-gray-600">← Back</button>
+      <button id="finishBtn" class="bg-green-600 text-white py-2 px-8 rounded-lg font-semibold hover:bg-green-700">
+        Finish ✅
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import "./firebase.js";
+import { auth, db, doc, setDoc, onAuthStateChanged } from "./firebase.js";
+
+let user = null;
+onAuthStateChanged(auth,(u)=>{ 
+  if(!u) location.href="index.html"; 
+  user=u;
+});
+
+// UI references
+const step1=document.getElementById("step1");
+const step2=document.getElementById("step2");
+const step3=document.getElementById("step3");
+const step1Circle=document.getElementById("step1Circle");
+const step2Circle=document.getElementById("step2Circle");
+const step3Circle=document.getElementById("step3Circle");
+
+// Navigation
+toStep2.onclick=()=>{
+  step1.classList.add("hidden");
+  step2.classList.remove("hidden");
+  step1Circle.classList.remove("step-active");
+  step2Circle.classList.add("step-active");
+};
+back1.onclick=()=>{
+  step2.classList.add("hidden");
+  step1.classList.remove("hidden");
+  step2Circle.classList.remove("step-active");
+  step1Circle.classList.add("step-active");
+};
+toStep3.onclick=()=>{
+  step2.classList.add("hidden");
+  step3.classList.remove("hidden");
+  step2Circle.classList.remove("step-active");
+  step3Circle.classList.add("step-active");
+};
+back2.onclick=()=>{
+  step3.classList.add("hidden");
+  step2.classList.remove("hidden");
+  step3Circle.classList.remove("step-active");
+  step2Circle.classList.add("step-active");
+};
+
+// Save + Finish
+finishBtn.onclick = async ()=>{
+  const data = {
+    businessName: bizName.value,
+    ownerName: ownerName.value,
+    phone: bizPhone.value,
+    email: bizEmail.value,
+    address: bizAddress.value,
+    gst: bizGst.value || null,
+    setupCompleted:true,
+    updatedAt:new Date()
+  };
+
+  await setDoc(doc(db,"users",user.uid),data,{merge:true});
+  location.href="dashboard.html";
+};
+
+// preview logo (not uploading yet)
+logoUpload.onchange = (e)=>{
+  const file = e.target.files[0];
+  logoPreview.textContent = file ? "Logo Selected ✅" : "Upload Logo";
+};
+function showToast(msg) {
+  const div = document.createElement("div");
+  div.className =
+    "fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg animate-fade";
+  div.textContent = msg;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 2500);
+}
+
+</script>
+
+</body>
+</html>
