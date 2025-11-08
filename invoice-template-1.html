@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice | HisabLink POS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      width: 80mm;
+      margin: 0 auto;
+      background: #fff;
+      color: #000;
+    }
+
+    h1, h2, h3, p, td, th { margin: 0; padding: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th, td {
+      padding: 2px 0;
+      text-align: left;
+    }
+
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .border-top { border-top: 1px dashed #000; }
+    .border-bottom { border-bottom: 1px dashed #000; }
+
+    @media print {
+      @page { size: 80mm auto; margin: 0; }
+      body { width: 80mm; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Company Header -->
+  <div class="text-center mb-2">
+    <h1 id="bizName" class="text-[13px] font-bold uppercase">Your Company Name</h1>
+    <p id="bizAddress" class="text-[10px]">Company Address</p>
+    <p id="bizGST" class="text-[10px]">GSTIN: —</p>
+    <p id="bizPhone" class="text-[10px]">📞 Phone</p>
+    <p id="bizEmail" class="text-[10px]">📧 Email</p>
+  </div>
+
+  <div class="border-top border-bottom my-1"></div>
+
+  <!-- Invoice Info -->
+  <div class="text-[10px] leading-tight mb-1">
+    <p><strong>Invoice #:</strong> <span id="invoiceNumber">INV0001</span></p>
+    <p><strong>Date:</strong> <span id="invoiceDate">-</span></p>
+    <p><strong>Customer:</strong> <span id="customerName">Walk-in</span></p>
+    <p id="customerPhone"></p>
+  </div>
+
+  <div class="border-top border-bottom my-1"></div>
+
+  <!-- Items -->
+  <table class="text-[10px]">
+    <thead class="border-bottom">
+      <tr>
+        <th>#</th>
+        <th>Item</th>
+        <th class="text-right">Qty</th>
+        <th class="text-right">Rate</th>
+        <th class="text-right">Amt</th>
+      </tr>
+    </thead>
+    <tbody id="invoiceItems"></tbody>
+  </table>
+
+  <div class="border-top my-1"></div>
+
+  <!-- Totals -->
+  <table class="text-[10px]">
+    <tr>
+      <td>Subtotal</td>
+      <td class="text-right" id="subTotalDisplay">₹0.00</td>
+    </tr>
+    <tr>
+      <td>Tax</td>
+      <td class="text-right" id="taxDisplay">₹0.00</td>
+    </tr>
+    <tr class="border-top">
+      <td><strong>Total</strong></td>
+      <td class="text-right font-bold text-[11px]" id="grandTotalDisplay">₹0.00</td>
+    </tr>
+  </table>
+
+  <!-- Payment Info -->
+  <div id="bankDetails" class="text-[9px] mt-1 hidden">
+    <p><strong>Payment:</strong></p>
+    <p id="bankName"></p>
+    <p id="accountNumber"></p>
+    <p id="ifsc"></p>
+    <p id="upiId"></p>
+  </div>
+
+  <div class="border-top border-bottom my-1"></div>
+
+  <!-- Footer -->
+  <div class="text-center text-[9px] mt-1">
+    <p>Thank you for shopping with us!</p>
+    <p><span id="footerBizName" class="font-semibold">HisabLink</span> — Smart Billing Platform</p>
+    <p>** This is a computer generated invoice **</p>
+  </div>
+
+  <!-- Print Button -->
+  <div class="no-print text-center mt-2">
+    <button onclick="window.print()" class="bg-black text-white px-3 py-1 rounded text-xs">🖨️ Print Bill</button>
+  </div>
+
+  <!-- Firestore Logic -->
+  <script type="module">
+    import { db, doc, getDoc } from "./firebase.js";
+
+    async function loadInvoice() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("inv");
+      if (!id) return alert("Invoice ID missing");
+
+      const invSnap = await getDoc(doc(db, "invoices", id));
+      if (!invSnap.exists()) return alert("Invoice not found");
+
+      const inv = invSnap.data();
+
+      // Invoice Meta
+      document.getElementById("invoiceNumber").textContent = id.slice(-6);
+      document.getElementById("invoiceDate").textContent =
+        inv.createdAt?.toDate().toLocaleString("en-IN") || "-";
+      document.getElementById("customerName").textContent = inv.customerName || "Walk-in";
+      document.getElementById("customerPhone").textContent = inv.customerPhone || "";
+
+      // Items
+      const tbody = document.getElementById("invoiceItems");
+      tbody.innerHTML = "";
+      (inv.items || []).forEach((i, idx) => {
+        const total = (i.qty * i.price * (1 + (i.tax || 0)/100)).toFixed(2);
+        tbody.innerHTML += `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${i.name}</td>
+            <td class="text-right">${i.qty}</td>
+            <td class="text-right">₹${i.price}</td>
+            <td class="text-right">₹${total}</td>
+          </tr>`;
+      });
+
+      document.getElementById("subTotalDisplay").textContent = "₹" + (inv.subtotal || 0).toFixed(2);
+      document.getElementById("taxDisplay").textContent = "₹" + (inv.tax || 0).toFixed(2);
+      document.getElementById("grandTotalDisplay").textContent = "₹" + (inv.total || 0).toFixed(2);
+
+      // Business Info
+      if (inv.userId) {
+        const bizSnap = await getDoc(doc(db, "businessProfile", inv.userId));
+        if (bizSnap.exists()) {
+          const b = bizSnap.data();
+          document.getElementById("bizName").textContent = b.companyName || "Your Business";
+          document.getElementById("footerBizName").textContent = b.companyName || "Your Business";
+          document.getElementById("bizAddress").textContent = b.address || "";
+          document.getElementById("bizGST").textContent = b.gstin ? `GSTIN: ${b.gstin}` : "";
+          document.getElementById("bizEmail").textContent = b.email ? `📧 ${b.email}` : "";
+          document.getElementById("bizPhone").textContent = b.phone ? `📞 ${b.phone}` : "";
+
+          if (b.bankName || b.accountNumber || b.ifsc || b.upiId) {
+            const bank = document.getElementById("bankDetails");
+            document.getElementById("bankName").textContent = b.bankName ? `🏦 ${b.bankName}` : "";
+            document.getElementById("accountNumber").textContent = b.accountNumber ? `A/C: ${b.accountNumber}` : "";
+            document.getElementById("ifsc").textContent = b.ifsc ? `IFSC: ${b.ifsc}` : "";
+            document.getElementById("upiId").textContent = b.upiId ? `UPI: ${b.upiId}` : "";
+            bank.classList.remove("hidden");
+          }
+        }
+      }
+    }
+
+    loadInvoice();
+  </script>
+</body>
+</html>

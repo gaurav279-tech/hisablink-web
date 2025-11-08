@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice | HisabLink Corporate Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f4f6;
+    }
+    h1, h2, h3 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    @page {
+      size: A4;
+      margin: 18mm;
+    }
+    @media print {
+      html, body {
+        width: 210mm;
+        height: 297mm;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+
+<body class="flex justify-center p-6">
+
+  <div class="bg-white shadow-xl w-[210mm] min-h-[297mm] border border-gray-200 rounded-xl overflow-hidden">
+
+    <!-- Header Strip -->
+    <div class="bg-gradient-to-r from-indigo-700 to-indigo-500 text-white px-8 py-6 flex justify-between items-center">
+      <div>
+        <h1 id="bizName" class="text-2xl font-bold uppercase">HisabLink Technologies Pvt. Ltd.</h1>
+        <p id="bizAddress" class="text-sm opacity-90">Address, City, State</p>
+        <p id="bizGST" class="text-xs opacity-80">GSTIN: —</p>
+      </div>
+      <div class="text-right">
+        <h2 class="text-4xl font-bold tracking-wide">INVOICE</h2>
+        <p id="invoiceId" class="text-sm opacity-90 mt-1">#INV0001</p>
+      </div>
+    </div>
+
+    <!-- Company Contact -->
+    <div class="px-8 py-3 bg-gray-50 text-xs text-gray-700 border-b border-gray-200 flex justify-between">
+      <div>
+        <p id="bizEmail">📧 contact@hisablink.com</p>
+        <p id="bizPhone">📞 +91 98765 43210</p>
+      </div>
+      <p class="text-right italic">Smart Billing Platform by HisabLink</p>
+    </div>
+
+    <!-- Invoice Info -->
+    <div class="grid grid-cols-2 px-8 py-4 text-sm border-b border-gray-200">
+      <div>
+        <p><span class="font-semibold text-gray-800">Invoice No:</span> <span id="invoiceNumber">INV-0001</span></p>
+        <p><span class="font-semibold text-gray-800">Invoice Date:</span> <span id="invoiceDate">-</span></p>
+      </div>
+      <div class="text-right">
+        <p><span class="font-semibold text-gray-800">Due Date:</span> <span id="dueDate">-</span></p>
+        <p><span class="font-semibold text-gray-800">Currency:</span> INR (₹)</p>
+      </div>
+    </div>
+
+    <!-- Billing / Shipping -->
+    <div class="grid grid-cols-2 px-8 py-6 gap-8 border-b border-gray-200">
+      <div>
+        <h3 class="text-indigo-700 font-semibold mb-2">Bill To</h3>
+        <p id="customerName" class="font-medium text-gray-800">Customer Name</p>
+        <p id="customerGST" class="text-xs text-gray-600"></p>
+        <p id="customerEmail" class="text-xs text-gray-600"></p>
+        <p id="customerPhone" class="text-xs text-gray-600"></p>
+        <p id="customerAddress" class="text-xs text-gray-600"></p>
+      </div>
+      <div>
+        <h3 class="text-indigo-700 font-semibold mb-2">Ship To</h3>
+        <p id="shipToName" class="font-medium text-gray-800">Same as Billing</p>
+        <p id="shipToAddress" class="text-xs text-gray-600"></p>
+      </div>
+    </div>
+
+    <!-- Item Table -->
+    <div class="px-8 py-6">
+      <table class="w-full text-sm border-collapse">
+        <thead class="bg-gray-100 border-b border-gray-200">
+          <tr>
+            <th class="text-left py-2 px-3">#</th>
+            <th class="text-left py-2 px-3">Item Description</th>
+            <th class="text-center py-2 px-3">Qty</th>
+            <th class="text-right py-2 px-3">Rate (₹)</th>
+            <th class="text-right py-2 px-3">Tax (%)</th>
+            <th class="text-right py-2 px-3">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="invoiceItems" class="divide-y divide-gray-100"></tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="flex justify-end px-8 pb-8">
+      <div class="w-80 text-sm border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <div class="flex justify-between px-3 py-2 border-b"><span>Subtotal</span><span id="subTotalDisplay">₹0.00</span></div>
+        <div class="flex justify-between px-3 py-2 border-b"><span>Tax</span><span id="taxDisplay">₹0.00</span></div>
+        <div class="flex justify-between px-3 py-3 font-semibold text-lg bg-gray-50 text-indigo-700"><span>Total</span><span id="grandTotalDisplay">₹0.00</span></div>
+      </div>
+    </div>
+
+    <!-- Bank Details -->
+    <div id="bankDetails" class="px-8 pb-6 text-sm text-gray-700 hidden">
+      <h3 class="font-semibold text-indigo-700 mb-2">Payment Information</h3>
+      <p id="bankName"></p>
+      <p id="accountNumber"></p>
+      <p id="ifsc"></p>
+      <p id="upiId"></p>
+    </div>
+
+    <!-- Notes / Terms -->
+    <div class="px-8 pb-6 text-xs text-gray-600 border-t border-gray-200 pt-3">
+      <h3 class="font-semibold text-gray-800 mb-1">Terms & Conditions</h3>
+      <p>1. All goods/services are subject to applicable GST laws.</p>
+      <p>2. Please make payment within due date.</p>
+      <p>3. Thank you for choosing HisabLink — Smart Billing Platform.</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-50 text-center text-xs text-gray-500 border-t border-gray-200 py-3">
+      © 2025 HisabLink Technologies Pvt. Ltd. — All Rights Reserved
+    </div>
+  </div>
+
+  <div class="no-print text-center mt-4">
+    <button onclick="window.print()" class="bg-indigo-700 text-white px-6 py-2 rounded-md hover:bg-indigo-800 transition">🖨️ Print / Download PDF</button>
+  </div>
+
+  <!-- Firestore Script -->
+  <script type="module">
+    import { db, doc, getDoc } from "./firebase.js";
+
+    async function loadInvoice() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("inv");
+      if (!id) return alert("Invoice ID missing");
+
+      const invSnap = await getDoc(doc(db, "invoices", id));
+      if (!invSnap.exists()) return alert("Invoice not found");
+
+      const inv = invSnap.data();
+
+      document.getElementById("invoiceId").textContent = "#" + id.slice(-6);
+      document.getElementById("invoiceNumber").textContent = id.slice(-6);
+      document.getElementById("invoiceDate").textContent = inv.createdAt?.toDate().toLocaleDateString() || "-";
+      document.getElementById("dueDate").textContent = inv.dueDate || "-";
+
+      document.getElementById("customerName").textContent = inv.customerName || "N/A";
+      document.getElementById("customerGST").textContent = inv.customerGST ? "GSTIN: " + inv.customerGST : "";
+      document.getElementById("customerEmail").textContent = inv.customerEmail || "";
+      document.getElementById("customerPhone").textContent = inv.customerPhone || "";
+      document.getElementById("customerAddress").textContent = inv.customerAddress || "";
+      document.getElementById("shipToAddress").textContent = inv.shipTo || "Same as billing";
+
+      const tbody = document.getElementById("invoiceItems");
+      tbody.innerHTML = "";
+      (inv.items || []).forEach((i, idx) => {
+        const amount = (i.qty * i.price * (1 + (i.tax || 0)/100)).toFixed(2);
+        tbody.innerHTML += `
+          <tr>
+            <td class="py-2 px-3">${idx + 1}</td>
+            <td class="py-2 px-3">${i.name}<p class='text-xs text-gray-500'>${i.desc || ""}</p></td>
+            <td class="py-2 px-3 text-center">${i.qty}</td>
+            <td class="py-2 px-3 text-right">₹${i.price}</td>
+            <td class="py-2 px-3 text-right">${i.tax || 0}%</td>
+            <td class="py-2 px-3 text-right">₹${amount}</td>
+          </tr>`;
+      });
+
+      document.getElementById("subTotalDisplay").textContent = "₹" + (inv.subtotal || 0).toFixed(2);
+      document.getElementById("taxDisplay").textContent = "₹" + (inv.tax || 0).toFixed(2);
+      document.getElementById("grandTotalDisplay").textContent = "₹" + (inv.total || 0).toFixed(2);
+
+      if (inv.userId) {
+        const bizSnap = await getDoc(doc(db, "businessProfile", inv.userId));
+        if (bizSnap.exists()) {
+          const b = bizSnap.data();
+          document.getElementById("bizName").textContent = b.companyName || "Your Business";
+          document.getElementById("bizGST").textContent = b.gstin ? `GSTIN: ${b.gstin}` : "";
+          document.getElementById("bizAddress").textContent = b.address || "";
+          document.getElementById("bizEmail").textContent = b.email ? `📧 ${b.email}` : "";
+          document.getElementById("bizPhone").textContent = b.phone ? `📞 ${b.phone}` : "";
+
+          if (b.bankName || b.accountNumber || b.ifsc || b.upiId) {
+            const bank = document.getElementById("bankDetails");
+            document.getElementById("bankName").textContent = b.bankName ? `🏦 ${b.bankName}` : "";
+            document.getElementById("accountNumber").textContent = b.accountNumber ? `A/C: ${b.accountNumber}` : "";
+            document.getElementById("ifsc").textContent = b.ifsc ? `IFSC: ${b.ifsc}` : "";
+            document.getElementById("upiId").textContent = b.upiId ? `UPI: ${b.upiId}` : "";
+            bank.classList.remove("hidden");
+          }
+        }
+      }
+    }
+    loadInvoice();
+  </script>
+
+</body>
+</html>
