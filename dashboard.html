@@ -169,6 +169,28 @@
   font-size: 11px;
   font-weight: 600;
 }
+#toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #16a34a; /* green-600 default for success */
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 
 
 
@@ -868,7 +890,7 @@ window.printInvoice = function(id) {
 import "./firebase.js";
 import {
   auth, onAuthStateChanged, signOut,
-  db, collection, addDoc, getDocs, deleteDoc, doc, getDoc,  // 👈 add getDoc here
+  db, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc,
   query, where, serverTimestamp
 } from "./firebase.js";
 
@@ -933,39 +955,50 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-  // --- Save Settings (replace current handler) ---
-const saveSettingsBtn = document.getElementById("saveSettings");
-saveSettingsBtn?.addEventListener("click", async () => {
-  console.log("💾 Save Settings clicked");
-  const user = auth.currentUser;
-  if (!user) return showToast("User not logged in ❌", "error");
+  // --- Save Settings ---
+  const saveSettingsBtn = document.getElementById("saveSettings");
+  console.log("Save button found:", !!saveSettingsBtn);
 
-  const payload = {
-    companyName: (document.getElementById("setCompanyName")?.value || "").trim(),
-    gstin: (document.getElementById("setGST")?.value || "").trim(),
-    email: (document.getElementById("setEmail")?.value || "").trim(),
-    phone: (document.getElementById("setPhone")?.value || "").trim(),
-    address: (document.getElementById("setAddress")?.value || "").trim(),
-    logoUrl: (document.getElementById("logoPreview")?.src) || "",
-    bankName: (document.getElementById("setBankName")?.value || "").trim(),
-    accountNumber: (document.getElementById("setAccount")?.value || "").trim(),
-    ifsc: (document.getElementById("setIfsc")?.value || "").trim(),
-    upiId: (document.getElementById("setUpi")?.value || "").trim(),
-    invoiceTemplate: (document.getElementById("setTemplate")?.value) || "invoice-template-1.html",
-    taxType: (document.getElementById("setTaxType")?.value) || "intra",
-    showLogo: Boolean(document.getElementById("setShowLogo")?.checked)
-  };
+  saveSettingsBtn?.addEventListener("click", async () => {
+    console.log("💾 Save Settings clicked");
+    const user = auth.currentUser;
 
-  try {
-    await setDoc(doc(db, "businessProfile", user.uid), payload, { merge: true });
-    showToast("Settings saved successfully ✅");
-  } catch (err) {
-    console.error("❌ Firestore save failed:", err);
-    showToast("Error saving settings ❌", "error");
-  }
+    if (!user) {
+      showToast("User not logged in ❌", "error");
+      return;
+    }
+
+    const payload = {
+      companyName: (document.getElementById("setCompanyName")?.value || "").trim(),
+      gstin: (document.getElementById("setGST")?.value || "").trim(),
+      email: (document.getElementById("setEmail")?.value || "").trim(),
+      phone: (document.getElementById("setPhone")?.value || "").trim(),
+      address: (document.getElementById("setAddress")?.value || "").trim(),
+      logoUrl: (document.getElementById("logoPreview")?.src) || "",
+      bankName: (document.getElementById("setBankName")?.value || "").trim(),
+      accountNumber: (document.getElementById("setAccount")?.value || "").trim(),
+      ifsc: (document.getElementById("setIfsc")?.value || "").trim(),
+      upiId: (document.getElementById("setUpi")?.value || "").trim(),
+      invoiceTemplate: (document.getElementById("setTemplate")?.value) || "invoice-template-1.html",
+      taxType: (document.getElementById("setTaxType")?.value) || "intra",
+      showLogo: Boolean(document.getElementById("setShowLogo")?.checked)
+    };
+
+    console.log("User UID:", user.uid);
+    console.log("Payload:", payload);
+
+    try {
+      // ✅ This is the correct place for your Firestore write
+      await setDoc(doc(db, "businessProfile", user.uid), payload, { merge: true });
+
+      showToast("Settings saved successfully ✅");
+    } catch (err) {
+      console.error("❌ Firestore save failed:", err);
+      showToast("Error saving settings ❌", "error");
+    }
+  });
 });
 
-});
 
 // Load customers into search suggestions
 async function renderCmdResults(query) {
@@ -1036,16 +1069,27 @@ const custTable = document.getElementById("custTable");
 let currentUser = null, deleteId=null;
 
 // ✅ Toast
-function showToast(msg,type="success"){
-  const el=document.getElementById("toast");
-  el.textContent=msg;
-  el.className=`fixed top-5 right-5 px-4 py-2 rounded shadow text-sm ${
-     type==="error"?"bg-red-600":"bg-green-600"
-  }`;
-  el.classList.remove("hidden");
-  setTimeout(()=>el.classList.add("hidden"),2000);
+function showToast(msg, type = "success") {
+  const el = document.getElementById("toast");
+  if (!el) return console.warn("⚠️ Missing #toast element");
+
+  el.textContent = msg;
+
+  // Set color depending on type
+  el.style.backgroundColor = type === "error" ? "#dc2626" : "#16a34a"; // red-600 or green-600
+
+  // Show the toast
+  el.classList.add("show");
+
+  // Hide after 2 seconds
+  setTimeout(() => {
+    el.classList.remove("show");
+  }, 2000);
 }
+
 window.showToast = showToast;
+
+
 
 // ✅ Auth Check
 onAuthStateChanged(auth,(u)=>{
@@ -1745,6 +1789,7 @@ class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justif
   </div>
 </div>
 
+<!-- ✅ Toast Notification -->
 
 </body>
 </html>
