@@ -25,7 +25,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCNZP2MqREyefSh6Hd5aDNoE5Ao9ctMDvQ",
   authDomain: "hisablink-web.firebaseapp.com",
   projectId: "hisablink-web",
-  storageBucket: "hisablink-web.appspot.com", // ✅ FIXED: correct bucket domain
+  storageBucket: "hisablink-web.firebasestorage.app", // ✅ FIXED: correct bucket domain
   messagingSenderId: "646463308956",
   appId: "1:646463308956:web:bbd5e9c6644ff474495959",
   measurementId: "G-X9DRKR8KS4"
@@ -82,3 +82,4 @@ export {
   getDownloadURL,
   logEvent
 };
+
