@@ -208,6 +208,19 @@
 </head>
 
 <body class="bg-slate-50 flex">
+  <script>
+  // ✅ Global placeholder with queue
+  window.__pendingPrints = [];
+  window.printInvoice = function(invoiceId) {
+    if (window.__printReady) {
+      window.__printInvoice(invoiceId);
+    } else {
+      console.warn("⏳ Print system not ready yet — queued.");
+      window.__pendingPrints.push(invoiceId);
+    }
+  };
+</script>
+
 
 <!-- ✅ Sidebar -->
 <aside class="w-60 bg-white border-r border-slate-200 h-screen fixed flex flex-col">
@@ -881,48 +894,7 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
 <div id="toast" class="hidden fixed top-5 right-5 text-white px-4 py-2 rounded-lg shadow-lg"></div>
 
 
-<script>
 
-import { db, doc, getDoc } from "./firebase.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-
-const auth = getAuth();
-
-window.printInvoice = async function (invoiceId) {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("⚠️ Please log in first.");
-    return;
-  }
-
-  try {
-    // 1️⃣ Fetch the business profile
-    const bizRef = doc(db, "businessProfile", user.uid);
-    const bizSnap = await getDoc(bizRef);
-
-    // 2️⃣ Determine which template to use
-    const template = bizSnap.exists() && bizSnap.data().defaultTemplate
-      ? bizSnap.data().defaultTemplate
-      : "invoice-template-1.html"; // fallback
-
-    // 3️⃣ Build the URL
-    const invoiceURL = `${template}?inv=${invoiceId}`;
-
-    // 4️⃣ Open and auto-print
-    const printWindow = window.open(invoiceURL, "_blank");
-
-    printWindow.onload = () => {
-      // optional: wait for template to finish rendering
-      setTimeout(() => printWindow.print(), 800);
-    };
-  } catch (err) {
-    console.error("❌ Error printing invoice:", err);
-    alert("Failed to open invoice for printing. Please try again.");
-  }
-};
-
-
-</script>
 
 <script type="module">
   // ✅ Make Print Invoice global
@@ -934,6 +906,45 @@ import {
   query, where, serverTimestamp
 } from "./firebase.js";
 
+window.__printInvoice = async function(invoiceId) {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("⚠️ Please log in first.");
+      return;
+    }
+
+    // 🔹 Get business profile
+    const bizSnap = await getDoc(doc(db, "businessProfile", user.uid));
+    const biz = bizSnap.exists() ? bizSnap.data() : {};
+
+    // 🔹 Determine invoice template
+    const template = biz.invoiceTemplate || "invoice-template-1.html";
+
+    // 🔹 Build URL
+    const url = `${template}?inv=${invoiceId}`;
+    console.log("🖨️ Opening invoice:", url);
+
+    // 🔹 Open invoice in new tab
+    const win = window.open(url, "_blank");
+    if (!win) return alert("⚠️ Please allow popups to view invoice.");
+    win.onload = () => setTimeout(() => win.print(), 700);
+
+  } catch (e) {
+    console.error("❌ Print failed:", e);
+    alert("Something went wrong while printing.");
+  }
+};
+
+// ✅ Once ready, mark print system available
+window.__printReady = true;
+console.log("✅ Print system fully ready!");
+
+// ✅ Process any queued prints (if user clicked before ready)
+if (window.__pendingPrints?.length) {
+  window.__pendingPrints.forEach(id => window.__printInvoice(id));
+  window.__pendingPrints = [];
+}
 
 
 function formatLocalDate(date) {
@@ -1723,6 +1734,10 @@ function exportDailySalesExcel(){
 
 
 
+
+
+
+
 </script>
 
 <script type="module" src="./settings.js"></script>
@@ -1802,6 +1817,7 @@ class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justif
     }
   });
 </script>
+
 
 
 </body>
