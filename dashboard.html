@@ -883,33 +883,44 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
 
 <script>
 
-import { getDoc, doc } from "./firebase.js";
-import { auth, db } from "./firebase.js";
+import { db, doc, getDoc } from "./firebase.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-window.printInvoice = async function (id) {
+const auth = getAuth();
+
+window.printInvoice = async function (invoiceId) {
   const user = auth.currentUser;
   if (!user) {
-    alert("Please login first!");
+    alert("⚠️ Please log in first.");
     return;
   }
 
   try {
-    const ref = doc(db, "businessProfile", user.uid);
-    const snap = await getDoc(ref);
-    const template = snap.exists() && snap.data().invoiceTemplate
-      ? snap.data().invoiceTemplate
+    // 1️⃣ Fetch the business profile
+    const bizRef = doc(db, "businessProfile", user.uid);
+    const bizSnap = await getDoc(bizRef);
+
+    // 2️⃣ Determine which template to use
+    const template = bizSnap.exists() && bizSnap.data().defaultTemplate
+      ? bizSnap.data().defaultTemplate
       : "invoice-template-1.html"; // fallback
 
-    const base = `${location.origin}${location.pathname.replace('dashboard.html', '')}`;
-    const url = `${base}${template}?inv=${id}`;
-    console.log("🧾 Opening template:", url);
+    // 3️⃣ Build the URL
+    const invoiceURL = `${template}?inv=${invoiceId}`;
 
-    window.open(url, "_blank");
+    // 4️⃣ Open and auto-print
+    const printWindow = window.open(invoiceURL, "_blank");
+
+    printWindow.onload = () => {
+      // optional: wait for template to finish rendering
+      setTimeout(() => printWindow.print(), 800);
+    };
   } catch (err) {
-    console.error("❌ Error loading invoice template:", err);
-    alert("Error loading invoice template.");
+    console.error("❌ Error printing invoice:", err);
+    alert("Failed to open invoice for printing. Please try again.");
   }
 };
+
 
 </script>
 
@@ -1390,9 +1401,10 @@ async function loadInvoices() {
   </td>
   <td class="py-2 px-3 text-right">
     <button onclick="printInvoice('${d.id}')"
- class="text-indigo-600 hover:underline text-sm">
- 📄 Print
+  class="text-indigo-600 hover:text-indigo-800 hover:scale-105 transition-all duration-150 text-sm">
+  📄 Print
 </button>
+
 
 
   </td>
