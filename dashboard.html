@@ -808,13 +808,43 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
       <div>
-        <label class="block text-slate-600 mb-1">Default Invoice Template</label>
-        <select id="setTemplate" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
-          <option value="invoice-template-1.html">Classic</option>
-          <option value="invoice-template-2.html">Modern</option>
-          <option value="invoice-template-3.html">Minimal</option>
-        </select>
-      </div>
+  <label class="block text-slate-600 dark:text-slate-300 mb-2 font-medium">Default Invoice Template</label>
+
+  <div id="templateSelector" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+    <!-- Each card -->
+    <div data-template="invoice-template-5.html"
+         class="template-card border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center cursor-pointer hover:ring-2 hover:ring-indigo-500 transition">
+      <h4 class="font-semibold text-slate-800 dark:text-slate-100 text-sm mb-1">🧾Classic</h4>
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">Simple & Professional</p>
+    </div>
+
+    <div data-template="invoice-template-3.html"
+         class="template-card border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center cursor-pointer hover:ring-2 hover:ring-indigo-500 transition">
+      <h4 class="font-semibold text-slate-800 dark:text-slate-100 text-sm mb-1">🌐Modern</h4>
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">Sleek Business Look</p>
+    </div>
+
+    <div data-template="invoice-template-4.html"
+         class="template-card border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center cursor-pointer hover:ring-2 hover:ring-indigo-500 transition">
+      <h4 class="font-semibold text-slate-800 dark:text-slate-100 text-sm mb-1">💼Professional</h4>
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">Detailed & Elegant</p>
+    </div>
+
+    <div data-template="invoice-template-1.html"
+         class="template-card border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center cursor-pointer hover:ring-2 hover:ring-indigo-500 transition">
+      <h4 class="font-semibold text-slate-800 dark:text-slate-100 text-sm mb-1">Compact</h4>
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">For Retail & Short Bills</p>
+    </div>
+
+    <div data-template="invoice-template-2.html"
+         class="template-card border border-slate-300 dark:border-slate-600 rounded-lg p-3 text-center cursor-pointer hover:ring-2 hover:ring-indigo-500 transition">
+      <h4 class="font-semibold text-slate-800 dark:text-slate-100 text-sm mb-1">🪶Google Style</h4>
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">Clean & Minimal UI</p>
+    </div>
+  </div>
+
+  <input type="hidden" id="setTemplate" />
+</div>
 
       <div>
         <label class="block text-slate-600 mb-1">Tax Type</label>
@@ -853,9 +883,32 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
 
 <script>
 
-window.printInvoice = function(id) {
-  const base = `${location.origin}${location.pathname.replace('dashboard.html', '')}`;
-  window.open(`${base}invoice-template.html?inv=${id}`, "_blank");
+import { getDoc, doc } from "./firebase.js";
+import { auth, db } from "./firebase.js";
+
+window.printInvoice = async function (id) {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please login first!");
+    return;
+  }
+
+  try {
+    const ref = doc(db, "businessProfile", user.uid);
+    const snap = await getDoc(ref);
+    const template = snap.exists() && snap.data().invoiceTemplate
+      ? snap.data().invoiceTemplate
+      : "invoice-template-1.html"; // fallback
+
+    const base = `${location.origin}${location.pathname.replace('dashboard.html', '')}`;
+    const url = `${base}${template}?inv=${id}`;
+    console.log("🧾 Opening template:", url);
+
+    window.open(url, "_blank");
+  } catch (err) {
+    console.error("❌ Error loading invoice template:", err);
+    alert("Error loading invoice template.");
+  }
 };
 
 </script>
@@ -1005,7 +1058,7 @@ onAuthStateChanged(auth,(u)=>{
   currentUser=u;
   loadCustomersTable();
   loadDashboardStats();
-  loadDailySales();
+  
   loadInvoices();
 
 
@@ -1713,7 +1766,30 @@ class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justif
     <ul id="cmdResults" class="max-h-72 overflow-y-auto text-sm bg-white/50 dark:bg-slate-900/50"></ul>
   </div>
 </div>
+<script>
+  // Initialize interactive selection
+  const cards = document.querySelectorAll(".template-card");
+  const input = document.getElementById("setTemplate");
 
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      cards.forEach(c => c.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-50", "dark:bg-indigo-900/20"));
+      card.classList.add("ring-2", "ring-indigo-500", "bg-indigo-50", "dark:bg-indigo-900/20");
+      input.value = card.dataset.template;
+      console.log("🎨 Selected template:", input.value);
+    });
+  });
+
+  // Auto-select previously saved value
+  window.addEventListener("DOMContentLoaded", () => {
+    const saved = window.__savedTemplate || "invoice-template-1.html";
+    const match = [...cards].find(c => c.dataset.template === saved);
+    if (match) {
+      match.classList.add("ring-2", "ring-indigo-500", "bg-indigo-50", "dark:bg-indigo-900/20");
+      input.value = saved;
+    }
+  });
+</script>
 
 
 </body>
