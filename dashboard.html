@@ -734,7 +734,135 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
   
   <section id="page-items" class="hidden p-2"><h2 class="text-xl font-semibold">Items</h2></section>
   <section id="page-reports" class="hidden p-2"><h2 class="text-xl font-semibold">Reports</h2></section>
-  <section id="page-settings" class="hidden p-2"><h2 class="text-xl font-semibold">Settings</h2></section>
+  <section id="page-settings" class="hidden space-y-6 p-4">
+
+  <!-- Header -->
+  <div>
+    <h2 class="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+      Settings
+    </h2>
+    <p class="text-xs text-slate-500">Manage your company profile, bank details & invoice preferences</p>
+  </div>
+
+  <!-- Company Profile -->
+  <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🏢 Company Information</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <label class="block text-slate-600 mb-1">Company Name</label>
+        <input id="setCompanyName" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">GSTIN</label>
+        <input id="setGST" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">Email</label>
+        <input id="setEmail" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">Phone</label>
+        <input id="setPhone" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-slate-600 mb-1">Address</label>
+        <textarea id="setAddress" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white"></textarea>
+      </div>
+
+      <div>
+  <label class="block text-slate-600 mb-1">Company Logo</label>
+
+  <div class="flex items-center gap-4">
+    <img id="logoPreview" src="" alt="Logo Preview"
+         class="w-20 h-20 object-contain border rounded-md bg-white dark:bg-slate-700" />
+
+    <div>
+      <input type="file" id="logoFile" accept="image/*" class="hidden" />
+      <button id="uploadLogoBtn"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">
+        Upload Logo
+      </button>
+      <p id="uploadStatus" class="text-xs text-slate-500 mt-1"></p>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+  <!-- Bank Details -->
+  <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🏦 Bank & Payment Details</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <label class="block text-slate-600 mb-1">Bank Name</label>
+        <input id="setBankName" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">Account Number</label>
+        <input id="setAccount" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">IFSC Code</label>
+        <input id="setIfsc" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">UPI ID</label>
+        <input id="setUpi" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Preferences -->
+  <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🧾 Invoice Preferences</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <label class="block text-slate-600 mb-1">Default Invoice Template</label>
+        <select id="setTemplate" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+          <option value="invoice-template-1.html">Classic</option>
+          <option value="invoice-template-2.html">Modern</option>
+          <option value="invoice-template-3.html">Minimal</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-slate-600 mb-1">Tax Type</label>
+        <select id="setTaxType" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
+          <option value="intra">Intra-State (CGST+SGST)</option>
+          <option value="inter">Inter-State (IGST)</option>
+        </select>
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="inline-flex items-center gap-2 mt-2">
+          <input id="setShowLogo" type="checkbox" class="accent-indigo-600">
+          <span class="text-slate-600 dark:text-slate-300 text-sm">Show company logo on invoice</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Button -->
+  <div class="flex justify-end">
+    <button id="saveSettings"
+      class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition">
+      💾 Save Settings
+    </button>
+  </div>
+
+</section>
+
 
 </div>
 
@@ -761,6 +889,10 @@ import {
   db, collection, addDoc, getDocs, deleteDoc, doc, getDoc,  // 👈 add getDoc here
   query, where, serverTimestamp
 } from "./firebase.js";
+import {
+  storage, ref, uploadBytes, getDownloadURL
+} from "./firebase.js";
+
 
 
 function formatLocalDate(date) {
@@ -796,6 +928,68 @@ document.addEventListener("keydown", e => {
     openCmd();
   }
   if (e.key === "Escape") closeCmd();
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+
+  const ref = doc(db, "businessProfile", user.uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const d = snap.data();
+
+    setCompanyName.value = d.companyName || "";
+    setGST.value = d.gstin || "";
+    setEmail.value = d.email || "";
+    setPhone.value = d.phone || "";
+    setAddress.value = d.address || "";
+    setBankName.value = d.bankName || "";
+    setAccount.value = d.accountNumber || "";
+    setIfsc.value = d.ifsc || "";
+    setUpi.value = d.upiId || "";
+    setTemplate.value = d.invoiceTemplate || "invoice-template-1.html";
+    setTaxType.value = d.taxType || "intra";
+    setShowLogo.checked = d.showLogo ?? true;
+
+    if (d.logoUrl) {
+  document.getElementById("logoPreview").src = d.logoUrl;
+}
+  }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  // --- Save Settings (replace current handler) ---
+const saveSettingsBtn = document.getElementById("saveSettings");
+saveSettingsBtn?.addEventListener("click", async () => {
+  console.log("💾 Save Settings clicked");
+  const user = auth.currentUser;
+  if (!user) return showToast("User not logged in ❌", "error");
+
+  const payload = {
+    companyName: (document.getElementById("setCompanyName")?.value || "").trim(),
+    gstin: (document.getElementById("setGST")?.value || "").trim(),
+    email: (document.getElementById("setEmail")?.value || "").trim(),
+    phone: (document.getElementById("setPhone")?.value || "").trim(),
+    address: (document.getElementById("setAddress")?.value || "").trim(),
+    logoUrl: (document.getElementById("logoPreview")?.src) || "",
+    bankName: (document.getElementById("setBankName")?.value || "").trim(),
+    accountNumber: (document.getElementById("setAccount")?.value || "").trim(),
+    ifsc: (document.getElementById("setIfsc")?.value || "").trim(),
+    upiId: (document.getElementById("setUpi")?.value || "").trim(),
+    invoiceTemplate: (document.getElementById("setTemplate")?.value) || "invoice-template-1.html",
+    taxType: (document.getElementById("setTaxType")?.value) || "intra",
+    showLogo: Boolean(document.getElementById("setShowLogo")?.checked)
+  };
+
+  try {
+    await setDoc(doc(db, "businessProfile", user.uid), payload, { merge: true });
+    showToast("Settings saved successfully ✅");
+  } catch (err) {
+    console.error("❌ Firestore save failed:", err);
+    showToast("Error saving settings ❌", "error");
+  }
+});
+
 });
 
 // Load customers into search suggestions
@@ -1039,7 +1233,7 @@ saveInvoice.onclick = async () => {
   await loadInvoices();
   await refreshAnalytics();
 };
-
+// ✅ Save Settings button handler
 
 
 // ✅ Customer modal
@@ -1422,7 +1616,42 @@ async function renderDailySales(period="30d", status="all"){
 
   window.__dailySalesExport = labels.map((d,i)=>({ Date: d, Sales: values[i] }));
 }
+// ✅ Upload Company Logo
+// --- Logo upload (replace current handler) ---
+const uploadBtn = document.getElementById("uploadLogoBtn");
+const fileInput = document.getElementById("logoFile");
+const logoPreview = document.getElementById("logoPreview");
+const uploadStatus = document.getElementById("uploadStatus");
 
+uploadBtn?.addEventListener("click", () => fileInput?.click());
+
+fileInput?.addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0];
+  const user = auth.currentUser;
+  if (!file || !user) return showToast("Login required to upload", "error");
+
+  uploadStatus.textContent = "Uploading...";
+  uploadStatus.classList.remove("text-red-500", "text-emerald-600");
+  uploadStatus.classList.add("text-indigo-500");
+
+  try {
+    const fileRef = ref(storage, `logos/${user.uid}/${file.name}`);
+    await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+
+    await setDoc(doc(db, "businessProfile", user.uid), { logoUrl: url }, { merge: true });
+
+    if (logoPreview) logoPreview.src = url;
+    uploadStatus.textContent = "Uploaded successfully ✅";
+    uploadStatus.classList.remove("text-indigo-500");
+    uploadStatus.classList.add("text-emerald-600");
+  } catch (err) {
+    console.error("Logo upload error:", err);
+    uploadStatus.textContent = "Upload failed ❌";
+    uploadStatus.classList.remove("text-indigo-500");
+    uploadStatus.classList.add("text-red-500");
+  }
+});
 
 async function renderTopCustomers(period="30d", status="all"){
   const range = getRange(period);
