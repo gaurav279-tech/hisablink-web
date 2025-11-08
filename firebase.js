@@ -69,3 +69,11 @@ export {
   limit,
   logEvent
 };
+// Expose globally for inline scripts / debugging
+window.db = db;
+window.auth = auth;
+window.doc = doc;
+window.setDoc = setDoc;
+window.getDoc = getDoc;
+window.collection = collection;
+window.addDoc = addDoc;
