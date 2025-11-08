@@ -799,32 +799,8 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
     </div>
   </div>
 
-  <!-- Bank Details -->
-  <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">🏦 Bank & Payment Details</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-      <div>
-        <label class="block text-slate-600 mb-1">Bank Name</label>
-        <input id="setBankName" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
-      </div>
-
-      <div>
-        <label class="block text-slate-600 mb-1">Account Number</label>
-        <input id="setAccount" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
-      </div>
-
-      <div>
-        <label class="block text-slate-600 mb-1">IFSC Code</label>
-        <input id="setIfsc" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
-      </div>
-
-      <div>
-        <label class="block text-slate-600 mb-1">UPI ID</label>
-        <input id="setUpi" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white">
-      </div>
-    </div>
-  </div>
+  
 
   <!-- Invoice Preferences -->
   <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -929,74 +905,6 @@ document.addEventListener("keydown", e => {
     openCmd();
   }
   if (e.key === "Escape") closeCmd();
-});
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
-
-  const ref = doc(db, "businessProfile", user.uid);
-  const snap = await getDoc(ref);
-  if (snap.exists()) {
-    const d = snap.data();
-
-    setCompanyName.value = d.companyName || "";
-    setGST.value = d.gstin || "";
-    setEmail.value = d.email || "";
-    setPhone.value = d.phone || "";
-    setAddress.value = d.address || "";
-    setBankName.value = d.bankName || "";
-    setAccount.value = d.accountNumber || "";
-    setIfsc.value = d.ifsc || "";
-    setUpi.value = d.upiId || "";
-    setTemplate.value = d.invoiceTemplate || "invoice-template-1.html";
-    setTaxType.value = d.taxType || "intra";
-    setShowLogo.checked = d.showLogo ?? true;
-  }
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-  // --- Save Settings ---
-  const saveSettingsBtn = document.getElementById("saveSettings");
-  console.log("Save button found:", !!saveSettingsBtn);
-
-  saveSettingsBtn?.addEventListener("click", async () => {
-    console.log("💾 Save Settings clicked");
-    const user = auth.currentUser;
-
-    if (!user) {
-      showToast("User not logged in ❌", "error");
-      return;
-    }
-
-    const payload = {
-      companyName: (document.getElementById("setCompanyName")?.value || "").trim(),
-      gstin: (document.getElementById("setGST")?.value || "").trim(),
-      email: (document.getElementById("setEmail")?.value || "").trim(),
-      phone: (document.getElementById("setPhone")?.value || "").trim(),
-      address: (document.getElementById("setAddress")?.value || "").trim(),
-      logoUrl: (document.getElementById("logoPreview")?.src) || "",
-      bankName: (document.getElementById("setBankName")?.value || "").trim(),
-      accountNumber: (document.getElementById("setAccount")?.value || "").trim(),
-      ifsc: (document.getElementById("setIfsc")?.value || "").trim(),
-      upiId: (document.getElementById("setUpi")?.value || "").trim(),
-      invoiceTemplate: (document.getElementById("setTemplate")?.value) || "invoice-template-1.html",
-      taxType: (document.getElementById("setTaxType")?.value) || "intra",
-      showLogo: Boolean(document.getElementById("setShowLogo")?.checked)
-    };
-
-    console.log("User UID:", user.uid);
-    console.log("Payload:", payload);
-
-    try {
-      // ✅ This is the correct place for your Firestore write
-      await setDoc(doc(db, "businessProfile", user.uid), payload, { merge: true });
-
-      showToast("Settings saved successfully ✅");
-    } catch (err) {
-      console.error("❌ Firestore save failed:", err);
-      showToast("Error saving settings ❌", "error");
-    }
-  });
 });
 
 
@@ -1252,8 +1160,6 @@ saveInvoice.onclick = async () => {
   await loadInvoices();
   await refreshAnalytics();
 };
-// ✅ Save Settings button handler
-
 
 // ✅ Customer modal
 const customerModal=document.getElementById("customerModal"),
@@ -1753,8 +1659,27 @@ function exportDailySalesExcel(){
 
 
 </script>
-<!-- ✅ Command Palette -->
-<!-- ✅ Command Palette -->
+
+<script type="module" src="./settings.js"></script>
+<script>
+  console.log("🧠 Checking if settings.js loads...");
+  window.__settingsModuleLoaded = false;
+
+  // Just in case we want a timeout check later
+  setTimeout(() => {
+    if (!window.__settingsModuleLoaded) {
+      console.error("❌ settings.js did NOT load — check path or type='module'");
+      const el = document.getElementById("toast");
+      if (el) {
+        el.textContent = "⚠️ Settings module not loaded!";
+        el.style.backgroundColor = "#dc2626";
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 2500);
+      }
+    }
+  }, 2000);
+</script>
+
 <div id="cmdPalette" 
 class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center pt-24 z-[1000]">
 
@@ -1789,7 +1714,7 @@ class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justif
   </div>
 </div>
 
-<!-- ✅ Toast Notification -->
+
 
 </body>
 </html>
