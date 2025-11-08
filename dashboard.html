@@ -774,24 +774,6 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
         <textarea id="setAddress" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white"></textarea>
       </div>
 
-      <div>
-  <label class="block text-slate-600 mb-1">Company Logo</label>
-
-  <div class="flex items-center gap-4">
-    <img id="logoPreview" src="" alt="Logo Preview"
-         class="w-20 h-20 object-contain border rounded-md bg-white dark:bg-slate-700" />
-
-    <div>
-      <input type="file" id="logoFile" accept="image/*" class="hidden" />
-      <button id="uploadLogoBtn"
-        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">
-        Upload Logo
-      </button>
-      <p id="uploadStatus" class="text-xs text-slate-500 mt-1"></p>
-    </div>
-  </div>
-</div>
-
     </div>
   </div>
 
@@ -889,9 +871,6 @@ import {
   db, collection, addDoc, getDocs, deleteDoc, doc, getDoc,  // 👈 add getDoc here
   query, where, serverTimestamp
 } from "./firebase.js";
-import {
-  storage, ref, uploadBytes, getDownloadURL
-} from "./firebase.js";
 
 
 
@@ -950,10 +929,6 @@ onAuthStateChanged(auth, async (user) => {
     setTemplate.value = d.invoiceTemplate || "invoice-template-1.html";
     setTaxType.value = d.taxType || "intra";
     setShowLogo.checked = d.showLogo ?? true;
-
-    if (d.logoUrl) {
-  document.getElementById("logoPreview").src = d.logoUrl;
-}
   }
 });
 
@@ -1509,6 +1484,12 @@ function updateRangeLabel(period) {
 periodSelect?.addEventListener("change", () => updateRangeLabel(periodSelect.value));
 updateRangeLabel(periodSelect?.value || "30d");
 
+const logoPreview = document.getElementById("logoPreview");
+const logoUrlInput = document.getElementById("setLogoUrl");
+
+logoUrlInput?.addEventListener("input", (e) => {
+  if (logoPreview) logoPreview.src = e.target.value.trim();
+});
 
 async function getCustomersMap(){
   if (customersCache) return customersCache;
@@ -1616,42 +1597,7 @@ async function renderDailySales(period="30d", status="all"){
 
   window.__dailySalesExport = labels.map((d,i)=>({ Date: d, Sales: values[i] }));
 }
-// ✅ Upload Company Logo
-// --- Logo upload (replace current handler) ---
-const uploadBtn = document.getElementById("uploadLogoBtn");
-const fileInput = document.getElementById("logoFile");
-const logoPreview = document.getElementById("logoPreview");
-const uploadStatus = document.getElementById("uploadStatus");
 
-uploadBtn?.addEventListener("click", () => fileInput?.click());
-
-fileInput?.addEventListener("change", async (e) => {
-  const file = e.target.files && e.target.files[0];
-  const user = auth.currentUser;
-  if (!file || !user) return showToast("Login required to upload", "error");
-
-  uploadStatus.textContent = "Uploading...";
-  uploadStatus.classList.remove("text-red-500", "text-emerald-600");
-  uploadStatus.classList.add("text-indigo-500");
-
-  try {
-    const fileRef = ref(storage, `logos/${user.uid}/${file.name}`);
-    await uploadBytes(fileRef, file);
-    const url = await getDownloadURL(fileRef);
-
-    await setDoc(doc(db, "businessProfile", user.uid), { logoUrl: url }, { merge: true });
-
-    if (logoPreview) logoPreview.src = url;
-    uploadStatus.textContent = "Uploaded successfully ✅";
-    uploadStatus.classList.remove("text-indigo-500");
-    uploadStatus.classList.add("text-emerald-600");
-  } catch (err) {
-    console.error("Logo upload error:", err);
-    uploadStatus.textContent = "Upload failed ❌";
-    uploadStatus.classList.remove("text-indigo-500");
-    uploadStatus.classList.add("text-red-500");
-  }
-});
 
 async function renderTopCustomers(period="30d", status="all"){
   const range = getRange(period);
