@@ -46,6 +46,11 @@ onAuthStateChanged(auth, (user) => {
       invoiceTemplate: document.getElementById("setTemplate")?.value,
       taxType: document.getElementById("setTaxType")?.value,
       showLogo: document.getElementById("setShowLogo")?.checked ?? true,
+        // 💳 Payment details
+        upiId: document.getElementById("setUpiId")?.value.trim(),
+        paytmLink: document.getElementById("setPaytmLink")?.value.trim(),
+        razorpayLink: document.getElementById("setRazorpayLink")?.value.trim(),
+        bankDetails: document.getElementById("setBankDetails")?.value.trim()
     };
 
     console.log("📤 Attempting Firestore write...");
@@ -86,6 +91,11 @@ async function loadBusinessProfile(uid) {
     document.getElementById("setTemplate").value = d.invoiceTemplate || "invoice-template-1.html";
     document.getElementById("setTaxType").value = d.taxType || "intra";
     document.getElementById("setShowLogo").checked = d.showLogo ?? true;
+    document.getElementById("setUpiId").value = d.upiId || "";
+    document.getElementById("setPaytmLink").value = d.paytmLink || "";
+    document.getElementById("setRazorpayLink").value = d.razorpayLink || "";
+    document.getElementById("setBankDetails").value = d.bankDetails || "";
+
   } else {
     console.log("ℹ️ No business profile found yet for this user.");
   }
