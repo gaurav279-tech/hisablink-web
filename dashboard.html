@@ -812,6 +812,27 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
     </div>
   </div>
 
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-4">
+  <div>
+    <label class="block text-slate-600 mb-1">UPI ID</label>
+    <input id="setUpiId" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white" placeholder="myshop@okicici">
+  </div>
+
+  <div>
+    <label class="block text-slate-600 mb-1">Paytm Payment Link</label>
+    <input id="setPaytmLink" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white" placeholder="https://paytm.me/yourid">
+  </div>
+
+  <div>
+    <label class="block text-slate-600 mb-1">Razorpay Payment Page</label>
+    <input id="setRazorpayLink" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white" placeholder="https://rzp.io/l/yourpage">
+  </div>
+
+  <div>
+    <label class="block text-slate-600 mb-1">Bank Transfer Details</label>
+    <textarea id="setBankDetails" class="w-full border p-2 rounded-md dark:bg-slate-700 dark:text-white" placeholder="Bank: HDFC Bank\nA/C: 1234567890\nIFSC: HDFC0001234"></textarea>
+  </div>
+</div>
 
   
 
@@ -901,10 +922,28 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
 
 import "./firebase.js";
 import {
-  auth, onAuthStateChanged, signOut,
-  db, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc,
-  query, where, serverTimestamp
+  auth,
+  db,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  serverTimestamp,
+  onAuthStateChanged,
+  signOut
 } from "./firebase.js";
+import {
+  onSnapshot,
+
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+
 
 window.__printInvoice = async function(invoiceId) {
   try {
@@ -1365,6 +1404,23 @@ document.getElementById("invoiceIdSearch")?.addEventListener("input", (e)=>{
   });
 });
 
+// 💳 Payment Modal Logic
+let currentInvoiceId = null;
+let currentAmount = 0;
+
+window.openPaymentModal = function (id, total) {
+  currentInvoiceId = id;
+  currentAmount = total;
+  document.getElementById("pmInvoiceId").textContent =
+    `Invoice: #${id.slice(-6)} | Amount: ₹${total}`;
+  document.getElementById("paymentModal").classList.remove("hidden");
+};
+
+window.closePaymentModal = function () {
+  document.getElementById("paymentModal").classList.add("hidden");
+};
+
+
 // LIVE CUSTOMER SEARCH
 document.getElementById("customerSearch").addEventListener("input", ()=>{
   const keyword = customerSearch.value.toLowerCase();
@@ -1411,6 +1467,11 @@ async function loadInvoices() {
     <span class="status-badge bg-yellow-100 text-yellow-800">${inv.status}</span>
   </td>
   <td class="py-2 px-3 text-right">
+    <button onclick="openPaymentModal('${d.id}', ${inv.total})" 
+  class="text-indigo-600 hover:text-indigo-800 text-sm">
+  💳 Collect
+</button>
+
     <button onclick="printInvoice('${d.id}')"
   class="text-indigo-600 hover:text-indigo-800 hover:scale-105 transition-all duration-150 text-sm">
   📄 Print
@@ -1423,6 +1484,98 @@ async function loadInvoices() {
 
   });
 }
+
+document.getElementById("confirmPaymentBtn").onclick = async () => {
+  try {
+    const method = document.getElementById("paymentMethod").value;
+    closePaymentModal();
+
+    const bizRef = doc(db, "businessProfile", currentUser.uid);
+    const bizSnap = await getDoc(bizRef);
+    const biz = bizSnap.exists() ? bizSnap.data() : {};
+
+    if (method === "Cash") {
+      await updateDoc(doc(db, "invoices", currentInvoiceId), {
+        status: "paid",
+        paymentMethod: "Cash",
+        paidAt: serverTimestamp(),
+      });
+      showToast("💵 Cash payment recorded!");
+      loadInvoices();
+      loadDashboardStats();
+      return;
+    }
+
+    if (method === "UPI") {
+      await openUPIPayment(biz, currentAmount, currentInvoiceId);
+    } 
+    else if (method === "Paytm" && biz.paytmLink) {
+      window.open(biz.paytmLink, "_blank");
+    } 
+    else if (method === "Razorpay" && biz.razorpayLink) {
+      window.open(biz.razorpayLink, "_blank");
+    } 
+    else if (method === "Bank Transfer" && biz.bankDetails) {
+      alert(`Transfer manually to:\n\n${biz.bankDetails}`);
+    } 
+    else if (method === "Cheque") {
+      alert("Collect cheque manually and mark paid later.");
+    }
+
+    await updateDoc(doc(db, "invoices", currentInvoiceId), {
+      status: "sent",
+      paymentMethod: method,
+      lastPaymentAttempt: serverTimestamp(),
+    });
+
+    showToast(`🔗 Redirecting to ${method}...`);
+
+  } catch (err) {
+    console.error("❌ Payment flow failed:", err);
+    showToast("Error processing payment ❌", "error");
+  }
+};
+
+// 💳 UPI Payment Helper
+async function openUPIPayment(biz, amount, invoiceId) {
+  if (!biz?.upiId) {
+    alert("UPI ID not found in your business profile!");
+    return;
+  }
+
+  const upiUrl = `upi://pay?pa=${biz.upiId}&pn=${encodeURIComponent(biz.companyName || "Business")}&am=${amount}&tn=Invoice%20${invoiceId}`;
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // 🧭 On mobile → open directly in UPI app
+  if (isMobile) {
+    console.log("📱 Opening UPI app:", upiUrl);
+    window.location.href = upiUrl;
+    return;
+  }
+
+  // 💻 On desktop → show QR modal
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiUrl)}&size=240x240`;
+
+  const modal = document.createElement("div");
+  modal.id = "upiQrModal";
+  modal.className = "fixed inset-0 bg-black/40 flex items-center justify-center z-50";
+
+  modal.innerHTML = `
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-[320px] text-center relative border border-gray-300">
+      <button onclick="document.getElementById('upiQrModal').remove()" class="absolute top-2 right-3 text-gray-600 text-xl">×</button>
+      <h2 class="text-lg font-semibold mb-3">Scan & Pay via UPI</h2>
+      <img src="${qrUrl}" alt="UPI QR" class="mx-auto rounded-lg border mb-3 shadow-sm" />
+      <p class="text-xs text-gray-600 break-all">${biz.upiId}</p>
+      <p class="text-sm font-medium text-green-700 mt-2">Use any UPI app (GPay, Paytm, PhonePe)</p>
+      <a href="${upiUrl}" target="_blank" class="text-xs text-blue-600 underline mt-2 inline-block">Open UPI link manually</a>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+
+
 
 // Theme Toggle + Save Preference
 const themeToggle = document.getElementById('themeToggle');
@@ -1457,7 +1610,7 @@ async function loadDashboardStats() {
 
     totalInvoiced += total;
 
-    if (inv.status === "paid") {
+    if (inv.status === "Paid") {
       totalPaid += total;
     } else {
       totalDue += total;
@@ -1818,6 +1971,38 @@ class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justif
   });
 </script>
 
+<div id="paymentModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm relative">
+    <button onclick="closePaymentModal()" class="absolute top-3 right-3 text-slate-500 text-xl">×</button>
+    <h2 class="text-lg font-semibold mb-4">Collect Payment</h2>
+
+    <p id="pmInvoiceId" class="text-sm text-slate-500 mb-4">Invoice: —</p>
+
+    <label class="block mb-1 text-sm font-medium text-slate-600">Payment Method</label>
+    <select id="paymentMethod" class="w-full border p-2 rounded mb-4">
+      <option value="Razorpay">💳 Razorpay / Online</option>
+      <option value="UPI">📱 UPI</option>
+      <option value="Cash">💵 Cash</option>
+      <option value="Bank Transfer">🏦 Bank Transfer</option>
+      <option value="Cheque">📄 Cheque</option>
+    </select>
+
+    <button id="confirmPaymentBtn" 
+      class="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700">
+      Confirm Payment
+    </button>
+    <div id="collectLinks" class="mt-4 border-t pt-3 hidden">
+  <p class="text-xs text-slate-500 mb-2">Quick Collect Links:</p>
+  <div class="flex flex-wrap gap-2">
+    <a id="upiCollectLink" target="_blank" class="text-indigo-600 hover:underline text-sm">💳 UPI Pay</a>
+    <a id="paytmLink" target="_blank" class="text-blue-600 hover:underline text-sm">📱 Paytm</a>
+    <a id="phonepeLink" target="_blank" class="text-purple-600 hover:underline text-sm">📲 PhonePe</a>
+    <a id="razorpayLink" target="_blank" class="text-emerald-600 hover:underline text-sm">💰 Razorpay</a>
+  </div>
+</div>
+
+  </div>
+</div>
 
 
 </body>
