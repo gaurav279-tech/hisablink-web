@@ -1,4 +1,6 @@
-// firebase.js — CDN modules
+// firebase.js — for HisabLink (GitHub Pages compatible)
+// -------------------------------------------------------
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import {
   getAuth,
@@ -10,7 +12,7 @@ import {
   signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail // ✅ added here
+  sendPasswordResetEmail // ✅ added
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 import {
@@ -36,7 +38,9 @@ import {
   isSupported
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
 
+// -------------------------------------------------------
 // ✅ Firebase Configuration
+// -------------------------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyCNZP2MqREyefSh6Hd5aDNoE5Ao9ctMDvQ",
   authDomain: "hisablink-web.firebaseapp.com",
@@ -47,24 +51,33 @@ const firebaseConfig = {
   measurementId: "G-X9DRKR8KS4"
 };
 
+// -------------------------------------------------------
 // ✅ Initialize Core Services
+// -------------------------------------------------------
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 auth.useDeviceLanguage();
 export const db = getFirestore(app);
 
-// ✅ Optional Analytics (safe init)
+// -------------------------------------------------------
+// ✅ Optional Analytics (non-blocking async init)
+// -------------------------------------------------------
 export let analytics = null;
-try {
-  if (firebaseConfig.measurementId) {
-    const supported = await isSupported();
-    if (supported) analytics = getAnalytics(app);
-  }
-} catch (e) {
-  console.warn("Analytics not supported:", e.message);
-}
 
-// ✅ Export commonly used Firebase methods
+(async () => {
+  try {
+    if (firebaseConfig.measurementId) {
+      const supported = await isSupported();
+      if (supported) analytics = getAnalytics(app);
+    }
+  } catch (err) {
+    console.warn("⚠️ Analytics not supported:", err.message);
+  }
+})();
+
+// -------------------------------------------------------
+// ✅ Export commonly used Firebase utilities
+// -------------------------------------------------------
 export {
   GoogleAuthProvider,
   signInWithPopup,
@@ -74,7 +87,7 @@ export {
   signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail, // ✅ added here too
+  sendPasswordResetEmail, // ✅ works now
   doc,
   setDoc,
   addDoc,
@@ -91,11 +104,12 @@ export {
   logEvent
 };
 
-// ✅ Optional: expose globally for inline scripts / quick debugging
+// -------------------------------------------------------
+// ✅ Optional: expose globally (for debugging in console)
+// -------------------------------------------------------
 window.db = db;
 window.auth = auth;
-window.doc = doc;
-window.setDoc = setDoc;
-window.getDoc = getDoc;
 window.collection = collection;
+window.getDoc = getDoc;
+window.setDoc = setDoc;
 window.addDoc = addDoc;
