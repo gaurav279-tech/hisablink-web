@@ -241,7 +241,10 @@
 
   <!-- Brand -->
   <div class="p-6 border-b">
-    <h1 class="text-lg font-semibold tracking-tight text-slate-900">HisabLink</h1>
+    <h1 class="text-xl font-bold tracking-tight text-slate-800">
+  <span class="text-indigo-600">Hyquantix</span> Invoice
+</h1>
+
     <p class="text-[11px] text-slate-500 mt-0.5">Smart Billing & Finance</p>
     <label for="themeToggle" class="flex items-center cursor-pointer select-none gap-2 mt-2">
   <span class="text-xs text-slate-600 dark:text-slate-300">Light</span>
@@ -782,7 +785,134 @@ bg-gradient-to-br from-amber-50 to-white dark:from-amber-900 dark:to-slate-900">
 </section>
 
   
-  <section id="page-items" class="hidden p-2"><h2 class="text-xl font-semibold">Items</h2></section>
+  <!-- Items Section -->
+<!-- 📦 INVENTORY / ITEMS PAGE -->
+<section id="page-items" class="hidden p-4 md:p-6 space-y-4">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+    <h2 class="text-xl md:text-2xl font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+      📦 <span>Inventory</span>
+    </h2>
+    <button id="addItemBtn"
+      class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition w-full sm:w-auto">
+      ➕ Add Item
+    </button>
+  </div>
+
+  <!-- Filters Row -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <select id="filterCategory"
+      class="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto">
+      <option value="all">All Categories</option>
+    </select>
+
+    <select id="sortItems"
+      class="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto">
+      <option value="name">Sort by Name</option>
+      <option value="price">Sort by Price</option>
+      <option value="qty">Sort by Quantity</option>
+    </select>
+
+    <!-- Search -->
+    <div class="relative flex-1 sm:max-w-xs">
+      <input id="searchItem" type="text" placeholder="Search item..."
+        class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-9 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+      <svg class="absolute right-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+        stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Items Table -->
+  <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+    <table class="min-w-full text-sm text-left text-slate-700 dark:text-slate-300">
+      <thead class="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+        <tr>
+          <th class="px-4 py-3 font-semibold">Item Name</th>
+          <th class="px-4 py-3 font-semibold">Category</th>
+          <th class="px-4 py-3 font-semibold">Qty</th>
+          <th class="px-4 py-3 font-semibold">Price</th>
+          <th class="px-4 py-3 font-semibold">Tax %</th>
+          <th class="px-4 py-3 text-right font-semibold">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="itemsTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+        <!-- Rows will render dynamically -->
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- Add/Edit Item Modal -->
+<div id="itemModal"
+  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-3">
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6 relative border border-slate-200 dark:border-slate-700">
+    
+    <button id="closeModal"
+      class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-lg">
+      ✕
+    </button>
+
+    <h3 id="modalTitle"
+      class="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
+      📝 Add Item
+    </h3>
+
+    <form id="itemForm" class="space-y-4">
+      <input type="hidden" id="itemId">
+
+      <div>
+        <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Item Name</label>
+        <input id="itemName" type="text" required
+          class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Category</label>
+          <input id="itemCategory" type="text"
+            class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Unit</label>
+          <input id="itemUnit" type="text" placeholder="pcs, kg..."
+            class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Price</label>
+          <input id="itemPrice" type="number" step="0.01"
+            class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Quantity</label>
+          <input id="itemQty" type="number"
+            class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Tax %</label>
+        <input id="itemTax" type="number" step="0.1"
+          class="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800">
+      </div>
+
+      <button type="submit"
+        class="w-full bg-indigo-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition">
+        💾 Save Item
+      </button>
+    </form>
+  </div>
+</div>
+
+
   <section id="page-reports" class="hidden p-2"><h2 class="text-xl font-semibold">Reports</h2></section>
   <section id="page-settings" class="hidden space-y-6 p-4">
 
@@ -959,7 +1089,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 
-
 window.__printInvoice = async function(invoiceId) {
   try {
     const user = auth.currentUser;
@@ -999,6 +1128,7 @@ if (window.__pendingPrints?.length) {
   window.__pendingPrints.forEach(id => window.__printInvoice(id));
   window.__pendingPrints = [];
 }
+
 
 
 function formatLocalDate(date) {
@@ -1209,38 +1339,110 @@ btnNewInvoice=document.getElementById("btnNewInvoice"),
 saveInvoice=document.getElementById("saveInvoice"),
 invCustomer=document.getElementById("invCustomer");
 
-btnNewInvoice.onclick=()=>{invoiceModal.classList.remove("hidden");invItems.innerHTML="";addRow();addRow();};
+btnNewInvoice.onclick = async () => {
+  // 🧩 Load inventory items first (from Firestore)
+  await loadInventoryItems();
+
+  // Then show invoice modal
+  invoiceModal.classList.remove("hidden");
+
+  // Reset the table and add default rows
+  invItems.innerHTML = "";
+  addRow();
+  addRow();
+};
+
 closeInvoice.onclick=()=>invoiceModal.classList.add("hidden");
 
-function addRow(){
-  const tr=document.createElement("tr");
-  tr.innerHTML=`
-  <td><input class="w-full border p-1 item-name"></td>
-  <td><input class="w-16 border p-1 item-qty" type="number" value="1"></td>
-  <td><input class="w-20 border p-1 item-price" type="number" value="0"></td>
-  <td><input class="w-16 border p-1 item-tax" type="number" value="0"></td>
-  <td class="item-total text-right">0</td>
-  <td><button class="text-red-500 remove">✕</button></td>`;
-  tr.querySelector(".remove").onclick=()=>tr.remove();
-  ["item-name","item-qty","item-price","item-tax"].forEach(c=>tr.querySelector("."+c).oninput=calc);
-  invItems.appendChild(tr); calc();
-}
-addItemBtn.onclick=addRow;
+// 🔹 Cache for inventory items
+let inventoryItems = [];
 
-// ✅ Invoice totals
-function calc(){
-  let sub=0,tax=0;
-  invItems.querySelectorAll("tr").forEach(tr=>{
-    const q=+tr.querySelector(".item-qty").value,
-          p=+tr.querySelector(".item-price").value,
-          t=+tr.querySelector(".item-tax").value;
-    const line=q*p, ltax=line*t/100;
-    sub+=line; tax+=ltax;
-    tr.querySelector(".item-total").textContent=(line+ltax).toFixed(2);
+// 🔹 Fetch inventory items once when invoice modal opens
+async function loadInventoryItems() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  const snap = await getDocs(collection(db, "users", uid, "items"));
+  inventoryItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  console.log("📦 Loaded Inventory Items:", inventoryItems.length);
+}
+
+// 🔹 Enhanced Add Row
+function addRow() {
+  const tr = document.createElement("tr");
+
+  // Build select dropdown of inventory
+  const options = inventoryItems
+    .map(i => `<option value="${i.id}">${i.name}</option>`)
+    .join("");
+
+  tr.innerHTML = `
+    <td>
+      <select class="item-name w-full border p-1 rounded">
+        <option value="">Select Item</option>
+        ${options}
+        <option value="custom">➕ Custom Item</option>
+      </select>
+    </td>
+    <td><input class="w-16 border p-1 item-qty" type="number" value="1"></td>
+    <td><input class="w-20 border p-1 item-price" type="number" value="0"></td>
+    <td><input class="w-16 border p-1 item-tax" type="number" value="0"></td>
+    <td class="item-total text-right">0</td>
+    <td><button class="text-red-500 remove">✕</button></td>
+  `;
+
+  // 🗑️ Delete row
+  tr.querySelector(".remove").onclick = () => {
+    tr.remove();
+    calc();
+  };
+
+  // 🧮 Auto-calc when inputs change
+  ["item-qty", "item-price", "item-tax"].forEach(cls =>
+    tr.querySelector("." + cls).addEventListener("input", calc)
+  );
+
+  // 🧠 Handle item selection from inventory
+  tr.querySelector(".item-name").addEventListener("change", (e) => {
+    const selectedId = e.target.value;
+
+    // If user selects "Custom"
+    if (selectedId === "custom") {
+      // Replace dropdown with a free-text input
+      e.target.outerHTML = `<input class="w-full border p-1 item-name" placeholder="Custom item name">`;
+      return;
+    }
+
+    // Otherwise, fill fields from inventory
+    const item = inventoryItems.find(i => i.id === selectedId);
+    if (item) {
+      tr.querySelector(".item-price").value = item.price || 0;
+      tr.querySelector(".item-tax").value = item.tax || 0;
+      tr.querySelector(".item-qty").value = 1;
+    }
+    calc();
   });
-  subTotal.textContent=sub.toFixed(2);
-  taxTotal.textContent=tax.toFixed(2);
-  grandTotal.textContent=(sub+tax).toFixed(2);
+
+  invItems.appendChild(tr);
+  calc();
+}
+
+// 🧩 Add button handler
+addItemBtn.onclick = addRow;
+
+// 🧾 Totals (unchanged)
+function calc() {
+  let sub = 0, tax = 0;
+  invItems.querySelectorAll("tr").forEach(tr => {
+    const q = +tr.querySelector(".item-qty").value || 0,
+          p = +tr.querySelector(".item-price").value || 0,
+          t = +tr.querySelector(".item-tax").value || 0;
+    const line = q * p, ltax = line * t / 100;
+    sub += line; tax += ltax;
+    tr.querySelector(".item-total").textContent = (line + ltax).toFixed(2);
+  });
+  subTotal.textContent = sub.toFixed(2);
+  taxTotal.textContent = tax.toFixed(2);
+  grandTotal.textContent = (sub + tax).toFixed(2);
 }
 
 // ✅ Load invoice customers dropdown
@@ -1257,38 +1459,105 @@ async function loadCustomers(){
 
 // ✅ Save Invoice
 saveInvoice.onclick = async () => {
-  const items = [];
-  invItems.querySelectorAll("tr").forEach(tr => items.push({
-    name: tr.querySelector(".item-name").value,
-    qty: Number(tr.querySelector(".item-qty").value),
-    price: Number(tr.querySelector(".item-price").value),
-    tax: Number(tr.querySelector(".item-tax").value)
-  }));
+  try {
+    if (!currentUser) return showToast("⚠️ Please login first");
 
-  const custSnap = await getDoc(
-    doc(db, "users", currentUser.uid, "customers", invCustomer.value)
-  );
-  const c = custSnap.data() || {};
+    const uid = currentUser.uid;
 
-  await addDoc(collection(db, "invoices"), {
-    userId: currentUser.uid,
-    customerId: invCustomer.value,
-    customerName: c.name || "Unknown",
-    customerEmail: c.email || "",
-    customerPhone: c.phone || "",
-    items,
-    subtotal: Number(subTotal.textContent),
-    tax: Number(taxTotal.textContent),
-    total: Number(grandTotal.textContent),
-    status: "sent",
-    createdAt: serverTimestamp()
-  });
+    // Collect invoice items
+    const items = [];
+    invItems.querySelectorAll("tr").forEach(tr => {
+      const name = tr.querySelector(".item-name")?.value?.trim();
+      const qty = Number(tr.querySelector(".item-qty").value) || 0;
+      const price = Number(tr.querySelector(".item-price").value) || 0;
+      const tax = Number(tr.querySelector(".item-tax").value) || 0;
 
-  showToast("Invoice saved ✅");
-  invoiceModal.classList.add("hidden");
-  await loadInvoices();
-  await refreshAnalytics();
+      if (name && qty > 0) items.push({ name, qty, price, tax });
+    });
+
+    if (!items.length) {
+      showToast("Please add at least one item ❌");
+      return;
+    }
+
+    // 🧾 Get customer data
+    const custSnap = await getDoc(doc(db, "users", uid, "customers", invCustomer.value));
+    const c = custSnap.data() || {};
+
+    // 🧩 Validate inventory
+    const insufficient = [];
+    const updates = [];
+
+    for (const it of items) {
+      const itemSnap = await getDocs(
+        collection(db, "users", uid, "items")
+      );
+
+      // Find matching item by name (case-insensitive)
+      const match = itemSnap.docs.find(
+        d => d.data().name.toLowerCase() === it.name.toLowerCase()
+      );
+
+      if (match) {
+        const itemRef = doc(db, "users", uid, "items", match.id);
+        const itemData = match.data();
+        const available = Number(itemData.quantity || 0);
+
+        if (it.qty > available) {
+          insufficient.push(`${itemData.name} (Available: ${available}, Needed: ${it.qty})`);
+        } else {
+          // Queue update (reduce stock)
+          updates.push({
+            ref: itemRef,
+            newQty: available - it.qty
+          });
+        }
+      }
+    }
+
+    // 🛑 Stop if stock insufficient
+    if (insufficient.length) {
+      showToast("❌ Insufficient stock:\n" + insufficient.join("\n"));
+      return;
+    }
+
+    // ✅ Save invoice document
+    const invoiceRef = await addDoc(collection(db, "invoices"), {
+      userId: uid,
+      customerId: invCustomer.value,
+      customerName: c.name || "Unknown",
+      customerEmail: c.email || "",
+      customerPhone: c.phone || "",
+      items,
+      subtotal: Number(subTotal.textContent),
+      tax: Number(taxTotal.textContent),
+      total: Number(grandTotal.textContent),
+      status: "sent",
+      createdAt: serverTimestamp()
+    });
+
+    // 🔄 Reduce inventory quantities
+    const updatePromises = updates.map(u =>
+      updateDoc(u.ref, {
+        quantity: u.newQty,
+        updatedAt: serverTimestamp()
+      })
+    );
+    await Promise.all(updatePromises);
+
+    // ✅ Done
+    showToast("Invoice saved ✅ — Inventory updated");
+    invoiceModal.classList.add("hidden");
+    await loadInvoices();
+    await loadItems(); // refresh inventory table
+    await refreshAnalytics();
+
+  } catch (err) {
+    console.error("❌ Error saving invoice:", err);
+    showToast("Something went wrong while saving the invoice ❌");
+  }
 };
+
 
 // ✅ Customer modal
 const customerModal=document.getElementById("customerModal"),
@@ -1625,7 +1894,7 @@ async function loadDashboardStats() {
 
     totalInvoiced += total;
 
-    if (inv.status === "Paid") {
+    if (inv.status === "paid") {
       totalPaid += total;
     } else {
       totalDue += total;
@@ -2038,6 +2307,180 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+</script>
+<script type="module">
+import {
+  auth, db, collection, doc, getDoc, getDocs,
+  setDoc, deleteDoc, serverTimestamp
+} from "./firebase.js";
+import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+
+// ---------------- INVENTORY SCRIPT ----------------
+
+// DOM References
+const addItemBtn = document.getElementById("addItemBtn");
+const itemModal = document.getElementById("itemModal");
+const closeModal = document.getElementById("closeModal");
+const itemForm = document.getElementById("itemForm");
+const itemsTableBody = document.getElementById("itemsTableBody");
+const searchItem = document.getElementById("searchItem");
+const filterCategory = document.getElementById("filterCategory");
+const sortItems = document.getElementById("sortItems");
+const exportItemsBtn = document.getElementById("exportItemsBtn");
+
+// Internal cache
+let itemsCache = [];
+
+// Load items when "Items" tab is clicked
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.page === "items") loadItems();
+  });
+});
+
+// Add item modal open
+addItemBtn.addEventListener("click", () => {
+  itemForm.reset();
+  document.getElementById("itemId").value = "";
+  document.getElementById("modalTitle").textContent = "Add Item";
+  itemModal.classList.remove("hidden");
+});
+
+// Close modal
+closeModal.addEventListener("click", () => itemModal.classList.add("hidden"));
+
+// Load items
+async function loadItems() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const snap = await getDocs(collection(db, "users", uid, "items"));
+  itemsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderItems();
+  updateKPIs();
+  updateCategoryFilter();
+}
+
+// Render table
+function renderItems() {
+  let filtered = [...itemsCache];
+  const q = searchItem.value.toLowerCase().trim();
+  const cat = filterCategory.value;
+  const sort = sortItems.value;
+
+  if (cat !== "all") filtered = filtered.filter(i => i.category === cat);
+  if (q) filtered = filtered.filter(i => i.name.toLowerCase().includes(q));
+
+  filtered.sort((a, b) => {
+    if (sort === "name") return a.name.localeCompare(b.name);
+    if (sort === "price") return a.price - b.price;
+    if (sort === "qty") return a.quantity - b.quantity;
+    return 0;
+  });
+
+  itemsTableBody.innerHTML = "";
+  if (!filtered.length) {
+    itemsTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-slate-500">No items found</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(i => {
+    const low = i.quantity < 5;
+    itemsTableBody.innerHTML += `
+      <tr class="${low ? 'bg-red-50 dark:bg-red-900/30' : ''}">
+        <td class="px-4 py-2">${i.name}</td>
+        <td class="px-4 py-2">${i.category || '-'}</td>
+        <td class="px-4 py-2">${i.quantity}</td>
+        <td class="px-4 py-2">₹${i.price.toFixed(2)}</td>
+        <td class="px-4 py-2">${i.tax}%</td>
+        <td class="px-4 py-2 text-right">
+          <button onclick="editItem('${i.id}')" class="text-indigo-600 text-sm">Edit</button>
+          <button onclick="deleteItem('${i.id}')" class="text-red-600 text-sm">Delete</button>
+        </td>
+      </tr>`;
+  });
+}
+
+// KPI Update
+function updateKPIs() {
+  const totalItems = itemsCache.length;
+  const totalQty = itemsCache.reduce((s, i) => s + (i.quantity || 0), 0);
+  const totalValue = itemsCache.reduce((s, i) => s + (i.price * i.quantity || 0), 0);
+  const lowStock = itemsCache.filter(i => i.quantity < 5).length;
+
+  document.getElementById("kpiTotalItems").textContent = totalItems;
+  document.getElementById("kpiTotalQty").textContent = totalQty;
+  document.getElementById("kpiValue").textContent = "₹" + totalValue.toLocaleString();
+  document.getElementById("kpiLowStock").textContent = lowStock;
+}
+
+// Category filter
+function updateCategoryFilter() {
+  const cats = [...new Set(itemsCache.map(i => i.category).filter(Boolean))];
+  filterCategory.innerHTML = `<option value="all">All Categories</option>`;
+  cats.forEach(c => (filterCategory.innerHTML += `<option value="${c}">${c}</option>`));
+}
+
+// Save item
+itemForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const id = document.getElementById("itemId").value || doc(collection(db, "users", uid, "items")).id;
+  await setDoc(doc(db, "users", uid, "items", id), {
+    name: itemName.value,
+    category: itemCategory.value,
+    price: +itemPrice.value,
+    quantity: +itemQty.value,
+    unit: itemUnit.value,
+    tax: +itemTax.value,
+    updatedAt: serverTimestamp(),
+    createdAt: serverTimestamp()
+  });
+  itemModal.classList.add("hidden");
+  loadItems();
+});
+
+// Edit item
+window.editItem = async id => {
+  const uid = auth.currentUser?.uid;
+  const ref = doc(db, "users", uid, "items", id);
+  const snap = await getDoc(ref);
+  const i = snap.data();
+  document.getElementById("itemId").value = id;
+  itemName.value = i.name;
+  itemCategory.value = i.category;
+  itemPrice.value = i.price;
+  itemQty.value = i.quantity;
+  itemUnit.value = i.unit;
+  itemTax.value = i.tax;
+  itemModal.classList.remove("hidden");
+};
+
+// Delete item
+window.deleteItem = async id => {
+  const uid = auth.currentUser?.uid;
+  if (confirm("Delete this item?")) {
+    await deleteDoc(doc(db, "users", uid, "items", id));
+    loadItems();
+  }
+};
+
+// Export inventory
+exportItemsBtn.addEventListener("click", () => {
+  const ws = XLSX.utils.json_to_sheet(itemsCache.map(i => ({
+    Name: i.name, Category: i.category, Quantity: i.quantity, Price: i.price, Value: i.price * i.quantity
+  })));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Inventory");
+  XLSX.writeFile(wb, "inventory.xlsx");
+});
+
+// Search / filter live
+searchItem.addEventListener("input", renderItems);
+filterCategory.addEventListener("change", renderItems);
+sortItems.addEventListener("change", renderItems);
 </script>
 
 </body>
