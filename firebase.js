@@ -1,20 +1,40 @@
 // firebase.js — CDN modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier,
-  signInWithPhoneNumber, onAuthStateChanged, signOut,
-  createUserWithEmailAndPassword, signInWithEmailAndPassword
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  onAuthStateChanged,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail // ✅ added here
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 import {
-  getFirestore, doc, setDoc, addDoc, getDoc, getDocs,
-  updateDoc, deleteDoc, serverTimestamp, collection, query, where, orderBy, limit
+  getFirestore,
+  doc,
+  setDoc,
+  addDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 import {
-  getAnalytics, logEvent, isSupported
+  getAnalytics,
+  logEvent,
+  isSupported
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
-
 
 // ✅ Firebase Configuration
 const firebaseConfig = {
@@ -54,6 +74,7 @@ export {
   signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail, // ✅ added here too
   doc,
   setDoc,
   addDoc,
@@ -69,7 +90,8 @@ export {
   limit,
   logEvent
 };
-// Expose globally for inline scripts / debugging
+
+// ✅ Optional: expose globally for inline scripts / quick debugging
 window.db = db;
 window.auth = auth;
 window.doc = doc;
