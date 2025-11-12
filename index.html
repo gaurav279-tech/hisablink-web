@@ -2019,26 +2019,30 @@ class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justif
 </div>
 
 <script>
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const menuToggle = document.getElementById("menuToggle");
+window.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const menuToggle = document.getElementById("menuToggle");
 
-menuToggle.addEventListener("click", (e) => {
-  e.preventDefault(); // stop any default action
-  sidebar.classList.toggle("-translate-x-full");
-  overlay.classList.toggle("hidden");
+  menuToggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    sidebar.classList.toggle("-translate-x-full");
+    overlay.classList.toggle("hidden");
+  });
+
+  overlay.addEventListener("click", (e) => {
+    e.preventDefault();
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+  });
 });
 
-overlay.addEventListener("click", (e) => {
-  e.preventDefault();
-  sidebar.classList.add("-translate-x-full");
-  overlay.classList.add("hidden");
-});
 </script>
 
 
 </body>
 </html>
+
 
 
 
