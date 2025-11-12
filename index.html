@@ -3,72 +3,138 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HisabLink — Login / Signup</title>
+<title>Hyquantix — Login / Signup</title>
+
+<!-- Tailwind + Lottie -->
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/gh/LottieFiles/lottie-player@v1.6.0/dist/lottie-player.js"></script>
+
+
 <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: { gold:"#c6a14b" }
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#2563eb",
+        dark: "#0f172a",
+      },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"]
       }
     }
   }
+}
 </script>
 
 <style>
+body {
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
 /* Floating label input */
 .group { position: relative; }
 .group input {
   width:100%; padding:13px 12px;
-  border:1px solid #d3d3d3; border-radius:10px;
-  background:rgba(255,255,255,.9);
-  transition: .2s;
+  border:1px solid #e5e7eb; border-radius:10px;
+  background:rgba(255,255,255,.95);
+  transition:.25s;
 }
-.group input:focus { border-color:var(--tw-color-gold); box-shadow:0 0 0 3px rgba(198,161,75,.25); outline:none; }
+.group input:focus {
+  border-color:var(--tw-color-primary);
+  box-shadow:0 0 0 4px rgba(37,99,235,.15);
+  outline:none;
+}
 .group label {
   position:absolute; top:14px; left:12px;
   font-size:14px; color:#777; pointer-events:none;
-  transition:.2s;
+  transition:.25s;
 }
 .group input:focus + label,
 .group input:not(:placeholder-shown)+label {
-  top:-6px; left:8px; background:white;
-  padding:0 6px; font-size:11px; color:#c6a14b;
+  top:-7px; left:10px; background:white;
+  padding:0 6px; font-size:11px; color:var(--tw-color-primary);
 }
 
-/* gradient blobs BG */
-.blob{position:absolute;width:420px;height:420px;border-radius:50%;
-background:linear-gradient(135deg,#6366f1,#ec4899,#facc15);
-filter:blur(120px);opacity:.28;animation:blob 12s infinite ease-in-out;}
-.blob2{animation-delay:-4s;}
-@keyframes blob{
-0%{transform:translate(-20%,-15%) scale(1);}
-33%{transform:translate(30%,-10%) scale(1.2);}
-66%{transform:translate(10%,25%) scale(.9);}
-100%{transform:translate(-20%,-15%) scale(1);}
+/* Card */
+.glass {
+  background:rgba(255,255,255,.25);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 8px 35px rgba(0,0,0,0.1);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.glass:hover {
+  transform:translateY(-2px);
+  box-shadow:0 12px 45px rgba(0,0,0,0.15);
+}
+
+/* Background */
+.bg-anim {
+  position: fixed; /* instead of absolute → covers full viewport */
+  inset: 0;
+  z-index: -1; /* keep behind everything */
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 30%, rgba(37,99,235,.1), transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(37,99,235,.08), transparent 40%);
+}
+
+.bg-anim lottie-player {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+  z-index: -1; /* also make sure the animation is behind all content */
+}
+
+
+/* Floating dots */
+.dot {
+  position:absolute;
+  width:8px;height:8px;
+  border-radius:50%;
+  background:rgba(37,99,235,0.4);
+  animation:float 10s infinite ease-in-out;
+}
+@keyframes float {
+  0%,100% { transform:translateY(0); opacity:.8; }
+  50% { transform:translateY(-30px); opacity:.3; }
 }
 </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center bg-gray-50 p-6 relative overflow-hidden">
+<body class="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 relative overflow-hidden font-sans">
 
-<div class="blob"></div>
-<div class="blob blob2"></div>
+<!-- New Lottie Player -->
+<script src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest" type="module"></script>
 
-<div class="glass relative z-10 w-full max-w-md bg-white/40 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-8">
+<div class="bg-anim">
+  <dotlottie-wc
+  src="https://lottie.host/6bf98c71-a300-4575-9829-9ec313aeeb06/FVke6IKSjB.lottie"
+  autoplay
+  loop
+  style="width:100vw;height:100vh;opacity:0.3;">
+</dotlottie-wc>
+</div>
+
+
+
+<!-- Main Card -->
+<div class="glass relative z-10 w-full max-w-md rounded-2xl p-8 md:p-10">
 
   <div class="text-center mb-6">
-    <div class="w-16 h-16 rounded-2xl border border-gold flex items-center justify-center text-2xl font-extrabold mx-auto">
-      <span class="text-gold">HL</span>
+    <div class="w-16 h-16 rounded-2xl border border-primary flex items-center justify-center text-2xl font-extrabold mx-auto">
+      <span class="text-primary">HL</span>
     </div>
-    <h1 class="mt-2 text-3xl font-extrabold">Hisab<span class="text-gold">Link</span></h1>
-    <p class="text-gray-600 text-sm">AI-powered business finance suite</p>
+    <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-gray-800">Hyquantix<span class="text-primary">Invoice</span></h1>
+    <p class="text-gray-500 text-sm">AI-powered business Invoice suite</p>
   </div>
 
   <!-- Tabs -->
-  <div class="flex mb-4 bg-white/50 rounded-lg overflow-hidden">
-    <button id="tabLogin" class="w-1/2 py-2 font-semibold bg-gold text-white">Login</button>
-    <button id="tabSignup" class="w-1/2 py-2 font-semibold text-gray-700">Sign Up</button>
+  <div class="flex mb-5 bg-white/80 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+    <button id="tabLogin" class="w-1/2 py-2 font-semibold bg-primary text-white transition-all">Login</button>
+    <button id="tabSignup" class="w-1/2 py-2 font-semibold text-gray-700 transition-all hover:bg-gray-100">Sign Up</button>
   </div>
 
   <!-- LOGIN FORM -->
@@ -78,14 +144,39 @@ filter:blur(120px);opacity:.28;animation:blob 12s infinite ease-in-out;}
       <label>Email</label>
     </div>
 
-    <div class="group">
-      <input id="loginPass" type="password" placeholder=" " required>
-      <label>Password</label>
-    </div>
+    <div class="group relative">
+  <input id="loginPass" type="password" placeholder=" " required>
+  <label>Password</label>
 
-    <button class="w-full bg-gold text-white font-semibold py-3 rounded-lg hover:bg-yellow-600 transition">Login</button>
+  <!-- Eye icon button -->
+  <button type="button" id="toggleLoginPass"
+    class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-primary transition">
+    <!-- Eye (visible state) -->
+    <svg id="eyeOpenLogin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+      stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M2.25 12s3.75-7.5 9.75-7.5S21.75 12 21.75 12s-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
 
-    <button id="googleBtn" type="button" class="w-full bg-white border py-3 rounded-lg flex items-center justify-center gap-2 font-medium hover:shadow">
+    <!-- Eye off (hidden state) -->
+    <svg id="eyeOffLogin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+      stroke-width="1.8" stroke="currentColor" class="w-5 h-5 hidden">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M3 3l18 18M10.477 10.477A3 3 0 0113.5 13.5m-1.06 4.19a9 9 0 01-8.43-5.69C5.25 9.75 8.25 6 12 6c.988 0 1.938.197 2.82.555M9.88 9.88l4.24 4.24" />
+    </svg>
+  </button>
+</div>
+
+    <p class="text-right">
+      <a id="forgotPasswordLink" class="text-primary text-sm font-medium cursor-pointer hover:underline">
+        Forgot Password?
+      </a>
+    </p>
+
+    <button class="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-blue-700 hover:shadow transition">Login</button>
+
+    <button id="googleBtn" type="button" class="w-full bg-white border py-3 rounded-lg flex items-center justify-center gap-2 font-medium hover:shadow-md transition">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
       Continue with Google
     </button>
@@ -105,22 +196,35 @@ filter:blur(120px);opacity:.28;animation:blob 12s infinite ease-in-out;}
       <input id="signupPhone" placeholder=" " required>
       <label>Phone Number</label>
     </div>
-    <div class="group">
-      <input id="signupPass" type="password" placeholder=" " required>
-      <label>Create Password</label>
-    </div>
+    <div class="group relative">
+  <input id="signupPass" type="password" placeholder=" " required>
+  <label>Create Password</label>
 
-    <button class="w-full bg-gold text-white font-semibold py-3 rounded-lg hover:bg-yellow-600 transition">Create Account</button>
+  <button type="button" id="toggleSignupPass"
+    class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-primary transition">
+    <svg id="eyeOpenSignup" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+      stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M2.25 12s3.75-7.5 9.75-7.5S21.75 12 21.75 12s-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+
+    <svg id="eyeOffSignup" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+      stroke-width="1.8" stroke="currentColor" class="w-5 h-5 hidden">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M3 3l18 18M10.477 10.477A3 3 0 0113.5 13.5m-1.06 4.19a9 9 0 01-8.43-5.69C5.25 9.75 8.25 6 12 6c.988 0 1.938.197 2.82.555M9.88 9.88l4.24 4.24" />
+    </svg>
+  </button>
+</div>
+
+
+    <button class="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-blue-700 hover:shadow transition">Create Account</button>
   </form>
 
-  <p class="text-xs text-center text-gray-500 mt-4">
+  <p class="text-xs text-center text-gray-500 mt-5">
     By continuing, you agree to our <a class="underline">Terms</a> & <a class="underline">Privacy Policy</a>
   </p>
 </div>
-
-<p class="text-xs text-gray-500 text-center mt-6 relative z-10">
-  © <span id="year"></span> HisabLink • Made in 🇮🇳
-</p>
 
 <script type="module">
 import "./firebase.js";
@@ -128,47 +232,78 @@ import {
   auth, db, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword,
   signInWithEmailAndPassword, doc, setDoc, serverTimestamp
 } from "./firebase.js";
+import { sendPasswordResetEmail } from "./firebase.js";
 
-/* YEAR */
-document.getElementById("year").textContent = new Date().getFullYear();
+// 👁️ Professional password visibility toggles
+function setupPasswordToggle(inputId, toggleId, openIconId, offIconId) {
+  const input = document.getElementById(inputId);
+  const toggle = document.getElementById(toggleId);
+  const eyeOpen = document.getElementById(openIconId);
+  const eyeOff = document.getElementById(offIconId);
 
-/* TAB SWITCH */
+  toggle.addEventListener("click", () => {
+    const showing = input.type === "text";
+    input.type = showing ? "password" : "text";
+    eyeOpen.classList.toggle("hidden", !showing);
+    eyeOff.classList.toggle("hidden", showing);
+  });
+}
+
+setupPasswordToggle("loginPass", "toggleLoginPass", "eyeOpenLogin", "eyeOffLogin");
+setupPasswordToggle("signupPass", "toggleSignupPass", "eyeOpenSignup", "eyeOffSignup");
+
+/* Password reset */
+document.getElementById("forgotPasswordLink").onclick = async () => {
+  const email = loginEmail.value;
+  if (!email) { alert("Please enter your email first."); return; }
+  await sendPasswordResetEmail(auth, email);
+  alert("Password reset link sent to your email ✅");
+};
+
+/* Tabs */
 const loginForm=document.getElementById("loginForm");
 const signupForm=document.getElementById("signupForm");
-tabLogin.onclick=()=>{tabLogin.classList.add("bg-gold","text-white");tabSignup.classList.remove("bg-gold","text-white");loginForm.classList.remove("hidden");signupForm.classList.add("hidden");};
-tabSignup.onclick=()=>{tabSignup.classList.add("bg-gold","text-white");tabLogin.classList.remove("bg-gold","text-white");signupForm.classList.remove("hidden");loginForm.classList.add("hidden");};
+tabLogin.onclick=()=>{tabLogin.classList.add("bg-primary","text-white");tabSignup.classList.remove("bg-primary","text-white");loginForm.classList.remove("hidden");signupForm.classList.add("hidden");};
+tabSignup.onclick=()=>{tabSignup.classList.add("bg-primary","text-white");tabLogin.classList.remove("bg-primary","text-white");signupForm.classList.remove("hidden");loginForm.classList.add("hidden");};
 
-/* SIGN UP */
+/* Signup */
 signupForm.onsubmit = async e=>{
   e.preventDefault();
   const email=signupEmail.value, pass=signupPass.value;
-
   const r = await createUserWithEmailAndPassword(auth,email,pass);
   await setDoc(doc(db,"users",r.user.uid),{
     uid:r.user.uid, name:signupName.value, phone:signupPhone.value, email,
     createdAt: serverTimestamp()
   });
-  location.href="onboarding.html"; // next file we will build
+  location.href="onboarding.html";
 };
 
-/* LOGIN */
-loginForm.onsubmit = async e=>{
+/* Login */
+loginForm.onsubmit = async e => {
   e.preventDefault();
-  await signInWithEmailAndPassword(auth,loginEmail.value,loginPass.value);
-  location.href="dashboard.html";
+  try {
+    await signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
+    alert("Login successful ✅");
+    location.href = "dashboard.html";
+  } catch (err) {
+    alert("❌ " + err.message);
+    console.error(err);
+  }
 };
 
-/* GOOGLE */
+
+
+
+/* Google Auth */
 googleBtn.onclick = async ()=>{
   const g = new GoogleAuthProvider();
   const r = await signInWithPopup(auth,g);
   await setDoc(doc(db,"users",r.user.uid),{
     uid:r.user.uid,name:r.user.displayName,email:r.user.email,phone:r.user.phoneNumber||"",createdAt:serverTimestamp()
   },{merge:true});
-  lshowToast("Account created ✅ Redirecting...");
-setTimeout(()=> location.href="verify-phone.html", 1200);
-
+  setTimeout(()=> location.href="verify-phone.html", 1200);
 };
 </script>
+
 </body>
 </html>
